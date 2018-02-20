@@ -1,0 +1,50 @@
+{
+	"plugins": [
+		"@babel/plugin-proposal-object-rest-spread",
+		"@babel/plugin-syntax-object-rest-spread"
+	],
+	"presets": [
+		[
+			"@babel/preset-env",
+			{
+				"targets": {
+					"node": "current"
+				},
+				"modules": false
+			}
+		]
+	],
+	"env": {
+		"commonjs": {
+			"presets": [
+				[
+					"@babel/preset-env",
+				{
+					"modules": "commonjs"
+				}
+				]
+			]
+		},	
+		"umd": {
+			"presets": [
+				[
+					"@babel/preset-env",
+				{
+					"modules": "umd"
+				}
+				]
+			]
+		},
+		"test": {
+			"presets": [
+				[
+					"@babel/preset-env",
+				{
+					"modules": "commonjs"
+				}
+				]
+			]
+		}
+	}
+}
+

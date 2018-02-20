@@ -1,0 +1,44 @@
+{
+	"name": "@davidisaaclee/interval-tree",
+	"version": "0.1.0",
+	"main": "./lib/index.js",
+	"module": "./es/index.js",
+	"author": "David Lee <david@david-lee.net>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/davidisaaclee/interval-tree"
+	},
+	"files": [
+		"es/",
+		"src/",
+		"lib/",
+		"dist/"
+	],
+	"keywords": [],
+	"scripts": {
+		"build:umd": "cross-env BABEL_ENV=umd babel src --out-dir dist",
+		"build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
+		"build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
+		"build": "npm run build:commonjs && npm run build:umd && npm run build:es",
+		"prepare": "npm run test && npm run build",
+		"test": "cross-env BABEL_ENV=test ava"
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.0.0-beta.39",
+		"@babel/core": "^7.0.0-beta.39",
+		"@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.39",
+		"@babel/plugin-syntax-object-rest-spread": "^7.0.0-beta.39",
+		"@babel/polyfill": "^7.0.0-beta.39",
+		"@babel/preset-env": "^7.0.0-beta.39",
+		"@babel/register": "^7.0.0-beta.39",
+		"ava": "^0.25.0",
+		"cross-env": "^5.1.3"
+	},
+	"dependencies": {},
+	"ava": {
+		"require": [
+			"@babel/register"
+		]
+	}
+}
