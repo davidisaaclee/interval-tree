@@ -9,7 +9,7 @@ test('empty / isEmpty', t => {
 });
 
 test('insert single item', t => {
-	const interval1 = { range: { low: 0, high: 10 }, id: 'interval1' };
+	const interval1 = { range: { low: 0, high: 10 }, value: 'interval1' };
 	const tree = R.pipe(
 		IT.insert(interval1),
 	)(
@@ -18,13 +18,13 @@ test('insert single item', t => {
 
 	t.false(IT.isEmpty(tree));
 	t.deepEqual(IT.toObject(R.identity, tree), {
-		[interval1.id]: interval1
+		[interval1.value]: interval1
 	});
 });
 
 test('insert multiple items', t => {
-	const interval1 = { range: { low: 0, high: 0 }, id: 'interval1' };
-	const interval2 = { range: { low: 0, high: 10 }, id: 'interval2' };
+	const interval1 = { range: { low: 0, high: 0 }, value: 'interval1' };
+	const interval2 = { range: { low: 0, high: 10 }, value: 'interval2' };
 	const tree = R.pipe(
 		IT.insert(interval1),
 		IT.insert(interval2),
@@ -34,15 +34,15 @@ test('insert multiple items', t => {
 
 	t.false(IT.isEmpty(tree));
 	t.deepEqual(IT.toObject(R.identity, tree), {
-		[interval1.id]: interval1,
-		[interval2.id]: interval2,
+		[interval1.value]: interval1,
+		[interval2.value]: interval2,
 	});
 });
 
 test('insert throws on negative length interval ranges', t => {
 	const negativeLengthInterval = {
 		range: { low: 10, high: 5 },
-		id: 'interval1' 
+		value: 'interval1' 
 	};
 	t.throws(
 		() => R.pipe(
