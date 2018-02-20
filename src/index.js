@@ -6,6 +6,7 @@ import * as errors from './errors';
 // Range ::= { low :: Number, high :: Number }
 // ID ::= Any
 
+
 // -- Construction
 
 // empty :: IntervalTree
@@ -71,7 +72,7 @@ function _toObject(tree) {
 const toObject = R.curry(_toObject);
 
 
-// -- Helpers
+// -- Private helpers
 
 // updateHighestEndpointInSubtree :: IntervalTree -> IntervalTree
 function updateHighestEndpointInSubtree(tree) {
