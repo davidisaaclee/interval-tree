@@ -22,7 +22,7 @@
 		"build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
 		"build": "npm run build:commonjs && npm run build:umd && npm run build:es",
 		"prepare": "npm run test && npm run build",
-		"test": "cross-env BABEL_ENV=test ava"
+		"test": "cross-env BABEL_ENV=test nyc ava"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.0.0-beta.39",
@@ -33,7 +33,9 @@
 		"@babel/preset-env": "^7.0.0-beta.39",
 		"@babel/register": "^7.0.0-beta.39",
 		"ava": "^0.25.0",
-		"cross-env": "^5.1.3"
+		"babel-plugin-istanbul": "^4.1.5",
+		"cross-env": "^5.1.3",
+		"nyc": "^11.4.1"
 	},
 	"dependencies": {
 		"ramda": "^0.25.0"
@@ -42,5 +44,16 @@
 		"require": [
 			"@babel/register"
 		]
+	},
+	"nyc": {
+		"require": [
+			"@babel/register"
+		],
+		"reporter": [
+			"lcov",
+			"text"
+		],
+		"sourceMap": false,
+		"instrument": false
 	}
 }
