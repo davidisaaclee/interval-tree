@@ -15,7 +15,7 @@ const empty = null;
 // node :: (Item, IntervalTree?, IntervalTree?) -> IntervalTree
 const node = (item, left = null, right = null) => {
 	if (item.range.high < item.range.low) {
-		throw new errors.InvalidRangeError(errors.messages.negativeLengthInterval(item));
+		throw new Error(errors.messages.negativeLengthInterval(item));
 	}
 
 	return ({

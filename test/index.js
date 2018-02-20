@@ -50,8 +50,6 @@ test('insert throws on negative length interval ranges', t => {
 		)(
 			IT.empty
 		),
-		errors.InvalidRangeError,
-		errors.messages.negativeLengthInterval(negativeLengthInterval)
-	);
+		errors.messages.negativeLengthInterval(negativeLengthInterval));
 });
 
