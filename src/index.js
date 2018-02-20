@@ -2,9 +2,9 @@ import * as R from 'ramda';
 
 import * as errors from './errors';
 
-// Item ::= { range :: Range, value :: Value }
+// Item ::= { range :: Range, id :: ID }
 // Range ::= { low :: Number, high :: Number }
-// Value ::= Any
+// ID ::= Any
 
 // -- Construction
 
@@ -56,15 +56,15 @@ const insert = R.curry(_insert);
 // isEmpty :: IntervalTree -> Bool
 const isEmpty = tree => tree == null;
 
-// toObject :: (Value -> String) -> IntervalTree -> { String -> Item }
-function _toObject(calculateHash, tree) {
+// toObject :: IntervalTree -> { ID -> Item }
+function _toObject(tree) {
 	if (isEmpty(tree)) {
 		return {};
 	} else {
 		return {
-			[calculateHash(tree.item.value)]: tree.item,
-			...toObject(calculateHash, tree.left),
-			...toObject(calculateHash, tree.right),
+			[tree.item.id]: tree.item,
+			...toObject(tree.left),
+			...toObject(tree.right),
 		};
 	}
 }
