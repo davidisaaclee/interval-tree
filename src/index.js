@@ -1,16 +1,7 @@
-/**
- * Implementation of an augmented interval tree.
- * @module interval-tree
- */
-
 import assert from 'assert';
 import * as R from 'ramda';
 
 import * as errors from './errors';
-
-// Item ::= { range :: Range, id :: ID }
-// Range ::= { low :: Number, high :: Number }
-// ID ::= Any
 
 /**
  * @typedef {number} Index
@@ -48,16 +39,22 @@ import * as errors from './errors';
  * @typedef {(Node|Leaf)} IntervalTree
  */
 
+
 // -- Construction
 
-// empty :: IntervalTree
 /** 
- * An empty `IntervalTree`.
+ * An empty interval tree.
  * @type {IntervalTree}
  */
 const empty = null;
 
-// node :: (Item, IntervalTree?, IntervalTree?) -> IntervalTree
+/**
+ * @private
+ * @param {Item} item
+ * @param {IntervalTree} left
+ * @param {IntervalTree} right
+ * @returns {IntervalTree}
+ */
 const node = (item, left = null, right = null) => {
 	if (item.range.high < item.range.low) {
 		throw new Error(errors.messages.negativeLengthInterval(item));
@@ -74,7 +71,14 @@ const node = (item, left = null, right = null) => {
 
 // -- Mutators
 
-// insert :: Item -> IntervalTree -> IntervalTree
+/**
+ * Insert an item into a tree. Does not rebalance the tree.
+ *
+ * @alias insert
+ * @param {Item} item
+ * @param {IntervalTree} tree
+ * @returns {IntervalTree}
+ */
 function _insert(item, tree) {
 	const nodeToInsert = node(item);
 
@@ -99,10 +103,22 @@ const insert = R.curry(_insert);
 
 // -- Accessors
 
-// isEmpty :: IntervalTree -> Bool
+/**
+ * Checks if a specified interval tree is empty.
+ *
+ * @param {IntervalTree} tree
+ * @returns {boolean}
+ */
 const isEmpty = tree => tree == null;
 
-// toObject :: IntervalTree -> { ID -> Item }
+/**
+ * Lists all intervals in an interval tree in a map from
+ * item ID to item.
+ *
+ * @alias toObject
+ * @param {IntervalTree} tree
+ * @returns {Object.<ItemID, Item>}
+ */
 function _toObject(tree) {
 	if (isEmpty(tree)) {
 		return {};
@@ -116,8 +132,15 @@ function _toObject(tree) {
 }
 const toObject = R.curry(_toObject);
 
-// Note: Includes intersections with endpoints of range.
-// queryIntersection :: Range -> IntervalTree -> { ID -> Item }
+/**
+ * Checks for intersections within the specified range. Includes intersections
+ * with endpoints of the query range.
+ *
+ * @alias queryIntersection
+ * @param {Range} range
+ * @param {IntervalTree} tree
+ * @returns {Object.<ItemID, Item>}
+ */
 function _queryIntersection(range, tree) {
 	if (isEmpty(tree)) {
 		return {};
