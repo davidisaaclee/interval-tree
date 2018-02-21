@@ -1,3 +1,8 @@
+/**
+ * Implementation of an augmented interval tree.
+ * @module interval-tree
+ */
+
 import assert from 'assert';
 import * as R from 'ramda';
 
@@ -7,10 +12,49 @@ import * as errors from './errors';
 // Range ::= { low :: Number, high :: Number }
 // ID ::= Any
 
+/**
+ * @typedef {number} Index
+ */
+
+/**
+ * @typedef {string} ItemID
+ */
+
+/**
+ * @typedef Range
+ * @property {Index} low
+ * @property {Index} high
+ */
+
+/**
+ * @typedef Item
+ * @property {Range} range
+ * @property {ItemID} id
+ */
+
+/**
+ * @typedef Node
+ * @property {Item} item
+ * @property {Index} highestEndpointInSubtree
+ * @property {IntervalTree} left
+ * @property {IntervalTree} right
+ */
+
+/**
+ * @typedef {null} Leaf
+ */
+
+/**
+ * @typedef {(Node|Leaf)} IntervalTree
+ */
 
 // -- Construction
 
 // empty :: IntervalTree
+/** 
+ * An empty `IntervalTree`.
+ * @type {IntervalTree}
+ */
 const empty = null;
 
 // node :: (Item, IntervalTree?, IntervalTree?) -> IntervalTree
