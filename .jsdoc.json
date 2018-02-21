@@ -1,0 +1,9 @@
+{
+	"source": {
+		"include": ["src"]
+	},
+	"opts": {
+		"destination": "./docs",
+		"template": "node_modules/ink-docstrap/template"
+	}
+}

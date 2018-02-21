@@ -1,6 +1,7 @@
 es
 lib
 dist
+docs
 node_modules
 
 .nyc_output
