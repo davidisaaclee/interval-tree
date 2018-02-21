@@ -1,3 +1,4 @@
+/** @module IntervalTree */
 import assert from 'assert';
 import * as R from 'ramda';
 
@@ -74,7 +75,7 @@ const node = (item, left = null, right = null) => {
 /**
  * Insert an item into a tree. Does not rebalance the tree.
  *
- * @alias insert
+ * @alias module:IntervalTree.insert
  * @param {Item} item
  * @param {IntervalTree} tree
  * @returns {IntervalTree}
@@ -115,7 +116,7 @@ const isEmpty = tree => tree == null;
  * Lists all intervals in an interval tree in a map from
  * item ID to item.
  *
- * @alias toObject
+ * @alias module:IntervalTree.toObject
  * @param {IntervalTree} tree
  * @returns {Object.<ItemID, Item>}
  */
@@ -136,7 +137,7 @@ const toObject = R.curry(_toObject);
  * Checks for intersections within the specified range. Includes intersections
  * with endpoints of the query range.
  *
- * @alias queryIntersection
+ * @alias module:IntervalTree.queryIntersection
  * @param {Range} range
  * @param {IntervalTree} tree
  * @returns {Object.<ItemID, Item>}
