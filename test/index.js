@@ -23,11 +23,13 @@ test('insert single item', t => {
 });
 
 test('insert multiple items', t => {
-	const interval1 = { range: { low: 0, high: 0 }, id: 'interval1' };
-	const interval2 = { range: { low: 0, high: 10 }, id: 'interval2' };
+	const interval1 = { range: { low: 0, high: 2 }, id: 'interval1' };
+	const interval2 = { range: { low: -5, high: 1 }, id: 'interval2' };
+	const interval3 = { range: { low: 5, high: 10 }, id: 'interval3' };
 	const tree = R.pipe(
 		IT.insert(interval1),
 		IT.insert(interval2),
+		IT.insert(interval3),
 	)(
 		IT.empty
 	);
@@ -36,6 +38,7 @@ test('insert multiple items', t => {
 	t.deepEqual(IT.toObject(tree), {
 		[interval1.id]: interval1,
 		[interval2.id]: interval2,
+		[interval3.id]: interval3,
 	});
 });
 

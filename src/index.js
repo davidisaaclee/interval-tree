@@ -1,3 +1,4 @@
+import assert from 'assert';
 import * as R from 'ramda';
 
 import * as errors from './errors';
