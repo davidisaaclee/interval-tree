@@ -72,8 +72,43 @@ function _toObject(tree) {
 }
 const toObject = R.curry(_toObject);
 
+// Note: Includes intersections with endpoints of range.
+// queryIntersection :: Range -> IntervalTree -> { ID -> Item }
+function _queryIntersection(range, tree) {
+	if (isEmpty(tree)) {
+		return {};
+	}
+
+	if (rangesIntersect(range, tree.item.range)) {
+		return {
+			[tree.item.id]: tree.item,
+			...queryIntersection(range, tree.left),
+			...queryIntersection(range, tree.right),
+		};
+	} else if (isEmpty(tree.left)) {
+		return queryIntersection(range, tree.right);
+	} else if (tree.left.highestEndpointInSubtree < range.low) {
+		return queryIntersection(range, tree.right);
+	} else {
+		// We can't make any assumptions about right subtree.
+		// If we stored the lowest endpoint in subtree, we could do a check
+		// like in the branch above, but to eliminate the right subtree.
+		return {
+			...queryIntersection(range, tree.left),
+			...queryIntersection(range, tree.right),
+		};
+	}
+}
+const queryIntersection = R.curry(_queryIntersection);
+
 
 // -- Private helpers
+
+// Note: Includes endpoints.
+// rangesIntersect :: Range -> Range -> Bool
+const rangesIntersect = R.curry((a, b) => (
+	a.high >= b.low && a.low <= b.high
+));
 
 // updateHighestEndpointInSubtree :: IntervalTree -> IntervalTree
 function updateHighestEndpointInSubtree(tree) {
@@ -106,5 +141,6 @@ export {
 	insert,
 	isEmpty,
 	toObject,
+	queryIntersection,
 };
 

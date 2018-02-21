@@ -56,3 +56,75 @@ test('insert throws on negative length interval ranges', t => {
 		errors.messages.negativeLengthInterval(negativeLengthInterval));
 });
 
+test('queryIntersection', t => {
+	const interval1 = { range: { low: 0, high: 2 }, id: 'interval1' };
+	const interval2 = { range: { low: -5, high: 1 }, id: 'interval2' };
+	const interval3 = { range: { low: 5, high: 10 }, id: 'interval3' };
+	const tree = R.pipe(
+		IT.insert(interval1),
+		IT.insert(interval2),
+		IT.insert(interval3),
+	)(
+		IT.empty
+	);
+
+	t.deepEqual(
+		IT.queryIntersection(
+			{ low: 1, high: 2 },
+			tree),
+		{
+			[interval1.id]: interval1,
+			[interval2.id]: interval2,
+		});
+
+	t.deepEqual(
+		IT.queryIntersection(
+			{ low: 3, high: 4 },
+			tree),
+		{});
+});
+
+test('queryIntersection2', t => {
+	const interval1 = { range: { low: 17, high: 19 }, id: 'interval1' };
+	const interval2 = { range: { low: 5, high: 8 }, id: 'interval2' };
+	const interval3 = { range: { low: 21, high: 24 }, id: 'interval3' };
+	const interval4 = { range: { low: 4, high: 8 }, id: 'interval4' };
+	const interval5 = { range: { low: 15, high: 18 }, id: 'interval5' };
+	const interval6 = { range: { low: 7, high: 10 }, id: 'interval6' };
+	const interval7 = { range: { low: 16, high: 22 }, id: 'interval7' };
+
+	const tree = R.pipe(
+		IT.insert(interval1),
+		IT.insert(interval2),
+		IT.insert(interval3),
+		IT.insert(interval4),
+		IT.insert(interval5),
+		IT.insert(interval6),
+		IT.insert(interval7),
+	)(
+		IT.empty
+	);
+
+	t.deepEqual(
+		IT.queryIntersection(
+			{ low: 23, high: 25 },
+			tree),
+		{
+			[interval3.id]: interval3,
+		});
+
+	t.deepEqual(
+		IT.queryIntersection(
+			{ low: 12, high: 14 },
+			tree),
+		{});
+
+	t.deepEqual(
+		IT.queryIntersection(
+			{ low: 21, high: 23 },
+			tree),
+		{
+			[interval3.id]: interval3,
+			[interval7.id]: interval7,
+		});
+});
