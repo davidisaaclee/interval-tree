@@ -4,58 +4,31 @@ import * as R from 'ramda';
 
 import * as errors from './errors';
 
-/**
- * @typedef {number} Index
- */
+// Index:: number
+// The type of the bounds of the intervals in an interval tree.
 
-/**
- * @typedef {string} ItemID
- */
+// ItemID:: string
+// A unique ID for an item contained in an interval tree.
 
-/**
- * @typedef Range
- * @property {Index} low
- * @property {Index} high
- */
+// Range:: { low: Index, high: Index }
+// A range of numbers specified by an upper and lower bound.
 
-/**
- * @typedef Item
- * @property {Range} range
- * @property {ItemID} id
- */
+// Item:: { id: ItemID, range: Range }
+// An item contained in an interval tree.
 
-/**
- * @typedef Node
- * @property {Item} item
- * @property {Index} highestEndpointInSubtree
- * @property {IntervalTree} left
- * @property {IntervalTree} right
- */
-
-/**
- * @typedef {null} Leaf
- */
-
-/**
- * @typedef {(Node|Leaf)} IntervalTree
- */
+// IntervalTree:: ?{ item: Item, highestEndpointInSubtree: Index, left: IntervalTree, right: IntervalTree}
+// An augmented interval tree node.
 
 
 // -- Construction
 
-/** 
- * An empty interval tree.
- * @type {IntervalTree}
- */
+// empty:: IntervalTree
+// #public
+// An empty interval tree.
 const empty = null;
 
-/**
- * @private
- * @param {Item} item
- * @param {IntervalTree} left
- * @param {IntervalTree} right
- * @returns {IntervalTree}
- */
+// node:: (Item, IntervalTree, IntervalTree) -> IntervalTree
+// Create a node with a value.
 const node = (item, left = null, right = null) => {
 	if (item.range.high < item.range.low) {
 		throw new Error(errors.messages.negativeLengthInterval(item));
@@ -72,14 +45,9 @@ const node = (item, left = null, right = null) => {
 
 // -- Mutators
 
-/**
- * Insert an item into a tree. Does not rebalance the tree.
- *
- * @alias module:IntervalTree.insert
- * @param {Item} item
- * @param {IntervalTree} tree
- * @returns {IntervalTree}
- */
+// insert:: (Item) -> (IntervalTree) -> IntervalTree
+// #public
+// Insert an item into a tree. Does not rebalance the tree.
 function _insert(item, tree) {
 	const nodeToInsert = node(item);
 
@@ -104,22 +72,15 @@ const insert = R.curry(_insert);
 
 // -- Accessors
 
-/**
- * Checks if a specified interval tree is empty.
- *
- * @param {IntervalTree} tree
- * @returns {boolean}
- */
+// isEmpty:: (IntervalTree) -> bool
+// #public
+// Checks if a specified interval tree is empty.
 const isEmpty = tree => tree == null;
 
-/**
- * Lists all intervals in an interval tree in a map from
- * item ID to item.
- *
- * @alias module:IntervalTree.toObject
- * @param {IntervalTree} tree
- * @returns {Object.<ItemID, Item>}
- */
+
+// toObject:: (IntervalTree) -> map<ItemID, Item>
+// #public
+// Lists all intervals in an interval tree in a map from item ID to item.
 function _toObject(tree) {
 	if (isEmpty(tree)) {
 		return {};
@@ -132,15 +93,10 @@ function _toObject(tree) {
 }
 const toObject = R.curry(_toObject);
 
-/**
- * Checks for intersections within the specified range. Includes intersections
- * with endpoints of the query range.
- *
- * @alias module:IntervalTree.queryIntersection
- * @param {Range} range
- * @param {IntervalTree} tree
- * @returns {Object.<ItemID, Item>}
- */
+// queryIntersection:: (Range) -> (IntervalTree) -> map<ItemID, Item>
+// #public
+// Checks for intersections within the specified range.
+// Includes intersections with endpoints of the query range.
 function _queryIntersection(range, tree) {
 	if (isEmpty(tree)) {
 		return {};
@@ -169,13 +125,14 @@ const queryIntersection = R.curry(_queryIntersection);
 
 // -- Private helpers
 
-// Note: Includes endpoints.
-// rangesIntersect :: Range -> Range -> Bool
+// rangesIntersect:: (Range) -> (Range) -> Bool
+// Checks if two ranges intersect, including their endpoints.
 const rangesIntersect = R.curry((a, b) => (
 	a.high >= b.low && a.low <= b.high
 ));
 
-// updateHighestEndpointInSubtree :: IntervalTree -> IntervalTree
+// updateHighestEndpointInSubtree:: (IntervalTree) -> IntervalTree
+// Updates the specified node's `highestEndpointInSubtree` property.
 function updateHighestEndpointInSubtree(tree) {
 	if (isEmpty(tree)) {
 		return tree;
