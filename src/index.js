@@ -88,15 +88,15 @@ function _insert(item, tree) {
 	}
 
 	if (item.range.low < tree.item.range.low) {
-		return updateHighestEndpointInSubtree({
-			...tree,
-			left: insert(item, tree.left),
-		});
+		return updateHighestEndpointInSubtree(Object.assign(
+			{}, 
+			tree,
+			{ left: insert(item, tree.left) })); 
 	} else {
-		return updateHighestEndpointInSubtree({
-			...tree,
-			right: insert(item, tree.right)
-		});
+		return updateHighestEndpointInSubtree(Object.assign(
+			{},
+			tree,
+			{ right: insert(item, tree.right) }));
 	}
 };
 const insert = R.curry(_insert);
@@ -124,11 +124,10 @@ function _toObject(tree) {
 	if (isEmpty(tree)) {
 		return {};
 	} else {
-		return {
-			[tree.item.id]: tree.item,
-			...toObject(tree.left),
-			...toObject(tree.right),
-		};
+		return Object.assign(
+			{ [tree.item.id]: tree.item },
+			toObject(tree.left),
+			toObject(tree.right));
 	}
 }
 const toObject = R.curry(_toObject);
@@ -148,11 +147,10 @@ function _queryIntersection(range, tree) {
 	}
 
 	if (rangesIntersect(range, tree.item.range)) {
-		return {
-			[tree.item.id]: tree.item,
-			...queryIntersection(range, tree.left),
-			...queryIntersection(range, tree.right),
-		};
+		return Object.assign(
+			{ [tree.item.id]: tree.item },
+			queryIntersection(range, tree.left),
+			queryIntersection(range, tree.right));
 	} else if (isEmpty(tree.left)) {
 		return queryIntersection(range, tree.right);
 	} else if (tree.left.highestEndpointInSubtree < range.low) {
@@ -161,10 +159,9 @@ function _queryIntersection(range, tree) {
 		// We can't make any assumptions about right subtree.
 		// If we stored the lowest endpoint in subtree, we could do a check
 		// like in the branch above, but to eliminate the right subtree.
-		return {
-			...queryIntersection(range, tree.left),
-			...queryIntersection(range, tree.right),
-		};
+		return Object.assign(
+			queryIntersection(range, tree.left),
+			queryIntersection(range, tree.right));
 	}
 }
 const queryIntersection = R.curry(_queryIntersection);
@@ -198,10 +195,10 @@ function updateHighestEndpointInSubtree(tree) {
 			highestEndpointRight,
 			tree.item.range.high);
 
-	return {
-		...tree,
-		highestEndpointInSubtree
-	};
+	return Object.assign(
+		{},
+		tree,
+		{ highestEndpointInSubtree });
 }
 
 export {
