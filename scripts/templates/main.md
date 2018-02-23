@@ -17,7 +17,6 @@
 @toObject
 @queryIntersection
 
-## Helpers
 @rangesIntersect
 @updateHighestEndpointInSubtree
 
