@@ -5,18 +5,28 @@ import * as R from 'ramda';
 import * as errors from './errors';
 
 // Index:: number
+// #public
+// #typealias
 // The type of the bounds of the intervals in an interval tree.
 
 // ItemID:: string
+// #public
+// #typealias
 // A unique ID for an item contained in an interval tree.
 
 // Range:: { low: Index, high: Index }
+// #public
+// #typealias
 // A range of numbers specified by an upper and lower bound.
 
 // Item:: { id: ItemID, range: Range }
+// #public
+// #typealias
 // An item contained in an interval tree.
 
-// IntervalTree:: ?{ item: Item, highestEndpointInSubtree: Index, left: IntervalTree, right: IntervalTree}
+// IntervalTree:: union<null, { item: Item, highestEndpointInSubtree: Index, left: IntervalTree, right: IntervalTree}>
+// #public
+// #typealias
 // An augmented interval tree node.
 
 
