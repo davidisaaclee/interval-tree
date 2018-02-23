@@ -1189,9 +1189,9 @@ buf-compare@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/buf-compare/-/buf-compare-1.0.1.tgz#fef28da8b8113a0a0db4430b0b6467b69730b34a"
 
-builddocs@^0.3.2:
+"builddocs@https://github.com/davidisaaclee/builddocs":
   version "0.3.2"
-  resolved "https://registry.yarnpkg.com/builddocs/-/builddocs-0.3.2.tgz#4e6d8fce25c024117ea130c6f2a478e795717a54"
+  resolved "https://github.com/davidisaaclee/builddocs#c61e549f16f52e29116ef57b1c908959582faf68"
   dependencies:
     getdocs "^0.6.0"
     glob "^7.0.3"
