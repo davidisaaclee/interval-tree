@@ -11,9 +11,14 @@ const renderedDocumentation = builddocs.build({
 	allowUnresolvedTypes: true
 });
 
-const outputString = pug.renderFile(path.join(__dirname, 'templates', 'container.pug'), { renderedDocumentation });
+const outputString = 
+	pug.renderFile(
+		path.join(__dirname, 'templates', 'container.pug'),
+		{ renderedDocumentation });
 
-const outputPath = path.join(__dirname, '..', 'docs', 'index.html');
+const outputPath =
+	path.join(__dirname, '..', 'docs', 'index.html');
+
 mkdirp(path.dirname(outputPath), function (err) {
 	if (err != null) {
 		console.error(err);
