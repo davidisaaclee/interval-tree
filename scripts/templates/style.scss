@@ -1,0 +1,119 @@
+
+.returntype:before {
+	content: " → ";
+}
+
+.membername:after {
+	content: ": ";
+}
+
+.typeparams::before {
+	content: '<';
+}
+
+.typeparams::after {
+	content: '>';
+}
+
+.typeparams > *::after {
+	content: ', ';
+}
+
+.typeparams > *:last-child::after {
+	content: '';
+}
+
+.type[data-optional]::before {
+	content: '?';
+}
+
+.paramlist::before {
+	content: '(';
+}
+
+.paramlist::after {
+	content: ')';
+}
+
+.rest-param::before {
+	content: '...';
+}
+
+/* Customizations */
+
+/* Hide all definitions not tagged `public`. */
+dt:not([data-public]) {
+	display: none;
+}
+dt:not([data-public]) + dd {
+	display: none;
+}
+
+/* Only print parentheses around non-unary functions. */
+.paramlist::before {
+	content: '(';
+}
+.paramlist::after {
+	content: ')';
+}
+.paramlist[data-arity="1"]::before {
+	content: '';
+}
+.paramlist[data-arity="1"]::after {
+	content: '';
+}
+
+/* Display `map<key, value>` types as `{ [key]: value }`. */
+.type[data-typename="map"] > .parameterized-type {
+	display: none;
+}
+.type[data-typename="map"] > .typeparams::before {
+	content: '{ ';
+}
+.type[data-typename="map"] > .typeparams::after {
+	content: ' }';
+}
+.type[data-typename="map"] > .typeparams > *::after {
+	content: ' → ';
+}
+.type[data-typename="map"] > .typeparams > *:first-child::before {
+	content: '[';
+}
+.type[data-typename="map"] > .typeparams > *:first-child::after {
+	content: ']: ';
+}
+.type[data-typename="map"] > .typeparams > *:last-child::after {
+	content: '';
+}
+
+/* Display `union<a, b, ...>` as `a | b | ...`. */
+.type[data-typename="union"] > .parameterized-type {
+	display: none;
+}
+.type[data-typename="union"] > .typeparams::before {
+	content: '';
+}
+.type[data-typename="union"] > .typeparams::after {
+	content: '';
+}
+.type[data-typename="union"] > .typeparams > *::after {
+	content: ' | ';
+}
+.type[data-typename="union"] > .typeparams > *:last-child::after {
+	content: '';
+}
+
+/* Render definitions tagged with `typealias` as `Name ::= Type`. */
+dt[data-typealias] .membername:after {
+	content: " ::= ";
+}
+
+
+.type > a {
+	text-decoration: none;
+}
+
+.type > a:hover {
+	text-decoration: underline;
+}
+

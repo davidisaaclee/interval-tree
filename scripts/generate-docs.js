@@ -3,6 +3,7 @@ const path = require('path');
 const builddocs = require('builddocs');
 const mkdirp = require('mkdirp');
 const pug = require('pug');
+const sass = require('node-sass');
 
 const renderedDocumentation = builddocs.build({
 	name: 'interval-tree',
@@ -16,14 +17,24 @@ const outputString =
 		path.join(__dirname, 'templates', 'container.pug'),
 		{ renderedDocumentation });
 
-const outputPath =
-	path.join(__dirname, '..', 'docs', 'index.html');
+const renderedStyles = sass.renderSync({
+	file: path.join(__dirname, 'templates', 'style.scss'),
+});
 
-mkdirp(path.dirname(outputPath), function (err) {
+const outputDir =
+	path.join(__dirname, '..', 'docs');
+const htmlOutputPath =
+	path.join(outputDir, 'index.html');
+const stylesOutputPath =
+	path.join(outputDir, 'style.css');
+
+mkdirp(outputDir, function (err) {
 	if (err != null) {
 		console.error(err);
 	} else {
-		fs.writeFileSync(outputPath, outputString, { encoding: 'utf8' });
+		fs.writeFileSync(htmlOutputPath, outputString, { encoding: 'utf8' });
+		fs.writeFileSync(stylesOutputPath, renderedStyles.css, { encoding: 'utf8' });
 	}
 });
+
 
