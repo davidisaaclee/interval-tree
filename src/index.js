@@ -122,10 +122,9 @@ function _queryIntersection(range, tree) {
 		return queryIntersection(range, tree.right);
 	} else if (tree.left.highestEndpointInSubtree < range.low) {
 		return queryIntersection(range, tree.right);
+	} else if (tree.right.lowestEndpointInSubtree > range.high) {
+		return queryIntersection(range, tree.left);
 	} else {
-		// TODO: We can't make any assumptions about right subtree.
-		// If we stored the lowest endpoint in subtree, we could do a check
-		// like in the branch above, but to eliminate the right subtree.
 		return Object.assign(
 			queryIntersection(range, tree.left),
 			queryIntersection(range, tree.right));
