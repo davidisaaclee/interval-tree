@@ -128,3 +128,26 @@ test('queryIntersection2', t => {
 			[fixtures.tree1.intervals[6].id]: fixtures.tree1.intervals[6],
 		});
 });
+
+test('removing a leaf item from a tree', t => {
+	const tree = fixtures.tree1.tree;
+	const treeWithoutInterval2 = IT.remove(fixtures.tree1.intervals[2].id, tree);
+
+	t.deepEqual(
+		IT.toObject(treeWithoutInterval2),
+		R.dissoc(fixtures.tree1.intervals[2].id, IT.toObject(tree)));
+});
+
+test('removing a middle node from a tree', t => {
+	const tree = fixtures.tree1.tree;
+	const treeWithoutInterval1 = IT.remove(fixtures.tree1.intervals[1].id, tree);
+
+	t.deepEqual(
+		IT.toObject(treeWithoutInterval1),
+		R.dissoc(fixtures.tree1.intervals[1].id, IT.toObject(tree)));
+});
+
+test.todo('attempting to remove an item that doesn\'t exist from a tree');
+
+test.todo('removing item does not create an invalid augmented interval tree');
+

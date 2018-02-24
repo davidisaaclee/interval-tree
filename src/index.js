@@ -80,6 +80,15 @@ function _insert(item, tree) {
 };
 const insert = R.curry(_insert);
 
+// remove:: (ItemID) -> (IntervalTree) -> IntervalTree
+// #public
+// Returns a tree without the item with the specified item ID.
+// If multiple items have the same item ID, only one of them will be
+// removed; which one is undetermined.
+function _remove(itemID, tree) {
+	return tree;
+}
+const remove = R.curry(_remove);
 
 // -- Accessors
 
@@ -201,6 +210,7 @@ function updateLowestEndpointInTree(tree) {
 export {
 	empty,
 	insert,
+	remove,
 	isEmpty,
 	toObject,
 	queryIntersection,
