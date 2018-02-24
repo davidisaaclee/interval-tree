@@ -4,6 +4,26 @@ import * as R from 'ramda';
 import * as IT from '../src';
 import * as errors from '../src/errors';
 
+const fixtures = (() => {
+	let retval = {};
+
+	const intervals = [
+		{ range: { low: 17, high: 19 }, id: 'interval1' },
+		{ range: { low: 5, high: 8 }, id: 'interval2' },
+		{ range: { low: 21, high: 24 }, id: 'interval3' },
+		{ range: { low: 4, high: 8 }, id: 'interval4' },
+		{ range: { low: 15, high: 18 }, id: 'interval5' },
+		{ range: { low: 7, high: 10 }, id: 'interval6' },
+		{ range: { low: 16, high: 22 }, id: 'interval7' },
+	];
+
+	const tree = R.pipe(...R.map(IT.insert, intervals))(IT.empty);
+
+	retval['tree1'] = { tree, intervals };
+
+	return retval;
+})();
+
 test('empty / isEmpty', t => {
 	t.true(IT.isEmpty(IT.empty));
 });
@@ -85,46 +105,26 @@ test('queryIntersection', t => {
 });
 
 test('queryIntersection2', t => {
-	const interval1 = { range: { low: 17, high: 19 }, id: 'interval1' };
-	const interval2 = { range: { low: 5, high: 8 }, id: 'interval2' };
-	const interval3 = { range: { low: 21, high: 24 }, id: 'interval3' };
-	const interval4 = { range: { low: 4, high: 8 }, id: 'interval4' };
-	const interval5 = { range: { low: 15, high: 18 }, id: 'interval5' };
-	const interval6 = { range: { low: 7, high: 10 }, id: 'interval6' };
-	const interval7 = { range: { low: 16, high: 22 }, id: 'interval7' };
-
-	const tree = R.pipe(
-		IT.insert(interval1),
-		IT.insert(interval2),
-		IT.insert(interval3),
-		IT.insert(interval4),
-		IT.insert(interval5),
-		IT.insert(interval6),
-		IT.insert(interval7),
-	)(
-		IT.empty
-	);
-
 	t.deepEqual(
 		IT.queryIntersection(
 			{ low: 23, high: 25 },
-			tree),
+			fixtures.tree1.tree),
 		{
-			[interval3.id]: interval3,
+			[fixtures.tree1.intervals[2].id]: fixtures.tree1.intervals[2],
 		});
 
 	t.deepEqual(
 		IT.queryIntersection(
 			{ low: 12, high: 14 },
-			tree),
+			fixtures.tree1.tree),
 		{});
 
 	t.deepEqual(
 		IT.queryIntersection(
 			{ low: 21, high: 23 },
-			tree),
+			fixtures.tree1.tree),
 		{
-			[interval3.id]: interval3,
-			[interval7.id]: interval7,
+			[fixtures.tree1.intervals[2].id]: fixtures.tree1.intervals[2],
+			[fixtures.tree1.intervals[6].id]: fixtures.tree1.intervals[6],
 		});
 });
