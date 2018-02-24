@@ -24,7 +24,7 @@ import * as errors from './errors';
 // #typealias
 // An item contained in an interval tree.
 
-// IntervalTree:: union<null, { item: Item, highestEndpointInSubtree: Index, left: IntervalTree, right: IntervalTree}>
+// IntervalTree:: union<null, { item: Item, highestEndpointInSubtree: Index, lowestEndpointInSubtree: Index, left: IntervalTree, right: IntervalTree}>
 // #public
 // #typealias
 // An augmented interval tree node.
@@ -47,6 +47,7 @@ const node = (item, left = null, right = null) => {
 	return ({
 		item,
 		highestEndpointInSubtree: item.range.high,
+		lowestEndpointInSubtree: item.range.low,
 		left,
 		right
 	})
@@ -66,12 +67,12 @@ function _insert(item, tree) {
 	}
 
 	if (item.range.low < tree.item.range.low) {
-		return updateHighestEndpointInSubtree(Object.assign(
+		return updateExtrema(Object.assign(
 			{}, 
 			tree,
 			{ left: insert(item, tree.left) })); 
 	} else {
-		return updateHighestEndpointInSubtree(Object.assign(
+		return updateExtrema(Object.assign(
 			{},
 			tree,
 			{ right: insert(item, tree.right) }));
@@ -122,7 +123,7 @@ function _queryIntersection(range, tree) {
 	} else if (tree.left.highestEndpointInSubtree < range.low) {
 		return queryIntersection(range, tree.right);
 	} else {
-		// We can't make any assumptions about right subtree.
+		// TODO: We can't make any assumptions about right subtree.
 		// If we stored the lowest endpoint in subtree, we could do a check
 		// like in the branch above, but to eliminate the right subtree.
 		return Object.assign(
@@ -140,6 +141,10 @@ const queryIntersection = R.curry(_queryIntersection);
 const rangesIntersect = R.curry((a, b) => (
 	a.high >= b.low && a.low <= b.high
 ));
+
+// updateExtrema:: (IntervalTree) -> IntervalTree
+// Marks the specified node with its descendents' highest and lowest endpoints.
+const updateExtrema = R.pipe(updateHighestEndpointInSubtree, updateLowestEndpointInTree);
 
 // updateHighestEndpointInSubtree:: (IntervalTree) -> IntervalTree
 // Updates the specified node's `highestEndpointInSubtree` property.
@@ -166,6 +171,33 @@ function updateHighestEndpointInSubtree(tree) {
 		{},
 		tree,
 		{ highestEndpointInSubtree });
+}
+
+// updateLowestEndpointInTree:: (IntervalTree) -> IntervalTree
+// Updates the specified node's `lowestEndpointInSubtree` property.
+function updateLowestEndpointInTree(tree) {
+	if (isEmpty(tree)) {
+		return tree;
+	}
+
+	const lowestEndpointLeft = tree.left == null
+		? -Infinity
+		: tree.left.lowestEndpointInSubtree;
+
+	const lowestEndpointRight = tree.right == null
+		? -Infinity
+		: tree.right.lowestEndpointInSubtree;
+
+	const lowestEndpointInSubtree =
+		Math.max(
+			lowestEndpointLeft,
+			lowestEndpointRight,
+			tree.item.range.low);
+
+	return Object.assign(
+		{},
+		tree,
+		{ lowestEndpointInSubtree });
 }
 
 export {
