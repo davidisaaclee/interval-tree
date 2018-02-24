@@ -88,7 +88,6 @@ const insert = R.curry(_insert);
 // Checks if a specified interval tree is empty.
 const isEmpty = tree => tree == null;
 
-
 // toObject:: (IntervalTree) -> map<ItemID, Item>
 // #public
 // Lists all intervals in an interval tree in a map from item ID to item.
@@ -143,11 +142,11 @@ const rangesIntersect = R.curry((a, b) => (
 
 // updateExtrema:: (IntervalTree) -> IntervalTree
 // Marks the specified node with its descendents' highest and lowest endpoints.
-const updateExtrema = R.pipe(updateHighestEndpointInSubtree, updateLowestEndpointInTree);
+const updateExtrema = R.pipe(updateHighestEndpointInTree, updateLowestEndpointInTree);
 
-// updateHighestEndpointInSubtree:: (IntervalTree) -> IntervalTree
+// updateHighestEndpointInTree:: (IntervalTree) -> IntervalTree
 // Updates the specified node's `highestEndpointInSubtree` property.
-function updateHighestEndpointInSubtree(tree) {
+function updateHighestEndpointInTree(tree) {
 	if (isEmpty(tree)) {
 		return tree;
 	}

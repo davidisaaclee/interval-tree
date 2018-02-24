@@ -18,6 +18,8 @@
 @queryIntersection
 
 @rangesIntersect
-@updateHighestEndpointInSubtree
+@updateExtrema
+@updateHighestEndpointInTree
+@updateLowestEndpointInTree
 
 
