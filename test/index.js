@@ -8,13 +8,13 @@ const fixtures = (() => {
 	let retval = {};
 
 	const intervals = [
-		{ range: { low: 17, high: 19 }, id: 'interval1' },
-		{ range: { low: 5, high: 8 }, id: 'interval2' },
-		{ range: { low: 21, high: 24 }, id: 'interval3' },
-		{ range: { low: 4, high: 8 }, id: 'interval4' },
-		{ range: { low: 15, high: 18 }, id: 'interval5' },
-		{ range: { low: 7, high: 10 }, id: 'interval6' },
-		{ range: { low: 16, high: 22 }, id: 'interval7' },
+		{ range: { low: 17, high: 19 }, id: 'interval0' },
+		{ range: { low: 5, high: 8 }, id: 'interval1' },
+		{ range: { low: 21, high: 24 }, id: 'interval2' },
+		{ range: { low: 4, high: 8 }, id: 'interval3' },
+		{ range: { low: 15, high: 18 }, id: 'interval4' },
+		{ range: { low: 7, high: 10 }, id: 'interval5' },
+		{ range: { low: 16, high: 22 }, id: 'interval6' },
 	];
 
 	const tree = R.pipe(...R.map(IT.insert, intervals))(IT.empty);
@@ -186,7 +186,16 @@ test('attempting to remove an item that doesn\'t exist from a tree', t => {
 		IT.empty);
 });
 
-test.todo('removing item does not create an invalid augmented interval tree');
+test('removing item does not create an invalid augmented interval tree', t => {
+	const tree =
+		fixtures.tree1.tree;
+
+	for (let i = 0; i < fixtures.tree1.intervals.length; i++) {
+		const interval = fixtures.tree1.intervals[i];
+		t.notThrows(
+			() => R.pipe(IT.remove(interval.id), IT.validate)(tree));
+	}
+});
 
 test('validate passes on valid trees', t => {
 	t.deepEqual(

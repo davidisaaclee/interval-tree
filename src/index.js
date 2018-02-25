@@ -106,7 +106,7 @@ function _remove(itemID, tree) {
 	if (isEmpty(tree)) {
 		return tree;
 	} else if (tree.item.id === itemID) {
-		if (tree.left != null && tree.right != null) {
+		if (!isEmpty(tree.left) && !isEmpty(tree.right)) {
 			// Get in-order successor to `tree`; "delete" it; replace values in `tree`.
 			const successorLens =
 				lensForSuccessorElement(tree);
@@ -114,16 +114,19 @@ function _remove(itemID, tree) {
 
 			const successor = 
 				R.view(successorLens, tree);
-			assert.notEqual(successor, null, `Expected successor of ${JSON.stringify(tree)}`);
+			assert.notEqual(
+				successor,
+				null,
+				`Expected successor of ${JSON.stringify(tree)}`);
 
 			return R.pipe(
-				R.set(successorLens, null),
+				R.set(successorLens, empty),
 				R.set(lenses.item, successor.item),
 				updateExtrema
 			)(tree);
-		} else if (tree.left != null) {
+		} else if (!isEmpty(tree.left)) {
 			return tree.left;
-		} else if (tree.right != null) {
+		} else if (!isEmpty(tree.right)) {
 			return tree.right;
 		} else {
 			return empty;
@@ -264,7 +267,7 @@ function updateHighestEndpointInTree(tree) {
 	const highestEndpoint = R.converge(
 		Math.max,
 		[
-			R.view(lenses.highestEndpointInSubtree),
+			R.view(R.compose(lenses.item, R.lensProp('range'), R.lensProp('high'))),
 			R.pipe(
 				R.view(R.compose(lenses.leftChild, lenses.highestEndpointInSubtree)),
 				R.defaultTo(-Infinity)),
@@ -298,7 +301,7 @@ function updateLowestEndpointInTree(tree) {
 	const lowestEndpoint = R.converge(
 		Math.min,
 		[
-			R.view(lenses.lowestEndpointInSubtree),
+			R.view(R.compose(lenses.item, R.lensProp('range'), R.lensProp('low'))),
 			R.pipe(
 				R.view(R.compose(lenses.leftChild, lenses.lowestEndpointInSubtree)),
 				R.defaultTo(Infinity)),
