@@ -39,6 +39,12 @@ const lenses = {
 
 	// item :: Lens IntervalTree Item
 	item: R.lensProp('item'),
+
+	// highestEndpointInSubtree :: Lens IntervalTree Index
+	highestEndpointInSubtree: R.lensProp('highestEndpointInSubtree'),
+
+	// lowestEndpointInSubtree :: Lens IntervalTree Index
+	lowestEndpointInSubtree: R.lensProp('lowestEndpointInSubtree'),
 };
 
 // -- Construction
@@ -77,17 +83,14 @@ function _insert(item, tree) {
 		return nodeToInsert;
 	}
 
-	if (item.range.low < tree.item.range.low) {
-		return updateExtrema(Object.assign(
-			{}, 
-			tree,
-			{ left: insert(item, tree.left) })); 
-	} else {
-		return updateExtrema(Object.assign(
-			{},
-			tree,
-			{ right: insert(item, tree.right) }));
-	}
+	const descendLens = item.range.low < tree.item.range.low
+		? lenses.leftChild
+		: lenses.rightChild;
+
+	return R.pipe(
+		R.over(descendLens, insert(item)),
+		updateExtrema
+	)(tree);
 };
 const insert = R.curry(_insert);
 
@@ -192,7 +195,9 @@ const rangesIntersect = R.curry((a, b) => (
 
 // updateExtrema:: (IntervalTree) -> IntervalTree
 // Marks the specified node with its descendents' highest and lowest endpoints.
-const updateExtrema = R.pipe(updateHighestEndpointInTree, updateLowestEndpointInTree);
+const updateExtrema = R.pipe(
+	updateHighestEndpointInTree,
+	updateLowestEndpointInTree);
 
 // updateHighestEndpointInTree:: (IntervalTree) -> IntervalTree
 // Updates the specified node's `highestEndpointInSubtree` property.
@@ -201,24 +206,31 @@ function updateHighestEndpointInTree(tree) {
 		return tree;
 	}
 
-	const highestEndpointLeft = tree.left == null
-		? -Infinity
-		: tree.left.highestEndpointInSubtree;
+	const updateChildren = R.pipe(
+		R.over(lenses.leftChild, updateHighestEndpointInTree),
+		R.over(lenses.rightChild, updateHighestEndpointInTree),
+	);
 
-	const highestEndpointRight = tree.right == null
-		? -Infinity
-		: tree.right.highestEndpointInSubtree;
+	const highestEndpoint = R.converge(
+		Math.max,
+		[
+			R.view(lenses.highestEndpointInSubtree),
+			R.pipe(
+				R.view(R.compose(lenses.leftChild, lenses.highestEndpointInSubtree)),
+				R.defaultTo(-Infinity)),
+			R.pipe(
+				R.view(R.compose(lenses.rightChild, lenses.highestEndpointInSubtree)),
+				R.defaultTo(-Infinity))
+		]);
 
-	const highestEndpointInSubtree =
-		Math.max(
-			highestEndpointLeft,
-			highestEndpointRight,
-			tree.item.range.high);
-
-	return Object.assign(
-		{},
-		tree,
-		{ highestEndpointInSubtree });
+	return R.pipe(
+		updateChildren,
+		R.converge(
+			R.set(lenses.highestEndpointInSubtree),
+			[highestEndpoint, R.identity]),
+	)(
+		tree
+	);
 }
 
 // updateLowestEndpointInTree:: (IntervalTree) -> IntervalTree
@@ -228,24 +240,31 @@ function updateLowestEndpointInTree(tree) {
 		return tree;
 	}
 
-	const lowestEndpointLeft = tree.left == null
-		? -Infinity
-		: tree.left.lowestEndpointInSubtree;
+	const updateChildren = R.pipe(
+		R.over(lenses.leftChild, updateLowestEndpointInTree),
+		R.over(lenses.rightChild, updateLowestEndpointInTree),
+	);
 
-	const lowestEndpointRight = tree.right == null
-		? -Infinity
-		: tree.right.lowestEndpointInSubtree;
+	const lowestEndpoint = R.converge(
+		Math.min,
+		[
+			R.view(lenses.lowestEndpointInSubtree),
+			R.pipe(
+				R.view(R.compose(lenses.leftChild, lenses.lowestEndpointInSubtree)),
+				R.defaultTo(Infinity)),
+			R.pipe(
+				R.view(R.compose(lenses.rightChild, lenses.lowestEndpointInSubtree)),
+				R.defaultTo(Infinity))
+		]);
 
-	const lowestEndpointInSubtree =
-		Math.max(
-			lowestEndpointLeft,
-			lowestEndpointRight,
-			tree.item.range.low);
-
-	return Object.assign(
-		{},
-		tree,
-		{ lowestEndpointInSubtree });
+	return R.pipe(
+		updateChildren,
+		R.converge(
+			R.set(lenses.lowestEndpointInSubtree),
+			[lowestEndpoint, R.identity]),
+	)(
+		tree
+	);
 }
 
 const hasChildren =
