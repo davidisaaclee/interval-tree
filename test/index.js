@@ -130,8 +130,10 @@ test('queryIntersection2', t => {
 });
 
 test('removing a leaf item from a tree', t => {
-	const tree = fixtures.tree1.tree;
-	const treeWithoutInterval2 = IT.remove(fixtures.tree1.intervals[2].id, tree);
+	const tree =
+		fixtures.tree1.tree;
+	const treeWithoutInterval2 =
+		IT.remove(fixtures.tree1.intervals[2].id, tree);
 
 	t.deepEqual(
 		IT.toObject(treeWithoutInterval2),
@@ -139,12 +141,27 @@ test('removing a leaf item from a tree', t => {
 });
 
 test('removing a middle node from a tree', t => {
-	const tree = fixtures.tree1.tree;
-	const treeWithoutInterval1 = IT.remove(fixtures.tree1.intervals[1].id, tree);
+	const tree =
+		fixtures.tree1.tree;
+	const treeWithoutInterval1 =
+		IT.remove(fixtures.tree1.intervals[1].id, tree);
 
 	t.deepEqual(
 		IT.toObject(treeWithoutInterval1),
 		R.dissoc(fixtures.tree1.intervals[1].id, IT.toObject(tree)));
+});
+
+test('removing each node from a tree', t => {
+	const tree =
+		fixtures.tree1.tree;
+
+	for (let i = 0; i < fixtures.tree1.intervals.length; i++) {
+		const interval = fixtures.tree1.intervals[i];
+
+		t.deepEqual(
+			IT.toObject(IT.remove(interval.id, tree)),
+			R.dissoc(interval.id, IT.toObject(tree)));
+	}
 });
 
 test.todo('attempting to remove an item that doesn\'t exist from a tree');

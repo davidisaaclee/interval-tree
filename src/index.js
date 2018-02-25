@@ -29,6 +29,17 @@ import * as errors from './errors';
 // #typealias
 // An augmented interval tree node.
 
+// -- Lenses
+const lenses = {
+	// leftChild :: Lens IntervalTree IntervalTree
+	leftChild: R.lensProp('left'),
+
+	// rightChild :: Lens IntervalTree IntervalTree
+	rightChild: R.lensProp('right'),
+
+	// item :: Lens IntervalTree Item
+	item: R.lensProp('item'),
+};
 
 // -- Construction
 
@@ -83,10 +94,40 @@ const insert = R.curry(_insert);
 // remove:: (ItemID) -> (IntervalTree) -> IntervalTree
 // #public
 // Returns a tree without the item with the specified item ID.
-// If multiple items have the same item ID, only one of them will be
-// removed; which one is undetermined.
+// If multiple items have the same item ID, behavior is undefined.
 function _remove(itemID, tree) {
-	return tree;
+	if (isEmpty(tree)) {
+		return tree;
+	} else if (tree.item.id === itemID) {
+		if (tree.left != null && tree.right != null) {
+			// Get in-order successor to `tree`; "delete" it; replace values in `tree`.
+			const successorLens =
+				lensForSuccessorElement(tree);
+			assert(successorLens != null);
+
+			const successor = 
+				R.view(successorLens, tree);
+			assert.notEqual(successor, null, `Expected successor of ${JSON.stringify(tree)}`);
+
+			return R.pipe(
+				R.set(successorLens, null),
+				R.set(lenses.item, successor.item),
+				updateExtrema,
+			)(tree);
+		} else if (tree.left != null) {
+			return tree.left;
+		} else if (tree.right != null) {
+			return tree.right;
+		} else {
+			return empty;
+		}
+	} else {
+		return R.pipe(
+			R.over(lenses.leftChild, remove(itemID)),
+			R.over(lenses.rightChild, remove(itemID)),
+			updateExtrema,
+		)(tree);
+	}
 }
 const remove = R.curry(_remove);
 
@@ -205,6 +246,41 @@ function updateLowestEndpointInTree(tree) {
 		{},
 		tree,
 		{ lowestEndpointInSubtree });
+}
+
+const hasChildren =
+	tree => tree.left != null || tree.right != null;
+
+// lensForCurrentMinElement :: (IntervalTree) -> ?(Lens IntervalTree IntervalTree)
+// Returns a lens focused on the position of the current minimum element in the specified tree.
+// If tree is empty, returns null instead of a lens.
+function lensForCurrentMinElement(tree) {
+	if (isEmpty(tree)) {
+		return null;
+	} else if (isEmpty(tree.left)) {
+		return R.identity;
+	} else {
+		return R.compose(
+			lenses.leftChild,
+			R.defaultTo(
+				R.identity,
+				lensForCurrentMinElement(tree.left)));
+	}
+}
+
+// lensForSuccessorElement :: (IntervalTree) -> ?(Lens IntervalTree IntervalTree)
+// If tree has no successor, returns null instead of a lens.
+function lensForSuccessorElement(tree) {
+	if (isEmpty(tree)) {
+		return null;
+	} if (isEmpty(tree.right)) {
+		return null;
+	} else {
+		return R.compose(
+			lenses.rightChild,
+			// guaranteed to be non-null
+			lensForCurrentMinElement(tree.right));
+	}
 }
 
 export {
