@@ -238,3 +238,42 @@ test('validate errors on trees with out-of-order right node', t => {
 		errors.messages.rightChildOutOfOrder(outOfOrderRightNodeTree.left));
 });
 
+test('validate errors on trees with incorrect highest endpoint', t => {
+	const { tree } = fixtures.tree1;
+
+	const nodeToTestLens =
+		R.lensPath(['left', 'left']);
+	const endpointLens =
+		R.compose(nodeToTestLens, R.lensProp('highestEndpointInSubtree'));
+
+	const modifiedTree = R.over(
+		endpointLens,
+		R.inc,
+		tree);
+
+	t.throws(
+		() => IT.validate(modifiedTree),
+		errors.messages.wrongHighestEndpointStored(
+			R.view(endpointLens, tree),
+			R.view(nodeToTestLens, modifiedTree)));
+});
+
+test('validate errors on trees with incorrect lowest endpoint', t => {
+	const { tree } = fixtures.tree1;
+
+	const nodeToTestLens =
+		R.lensPath(['left', 'left']);
+	const endpointLens =
+		R.compose(nodeToTestLens, R.lensProp('lowestEndpointInSubtree'));
+
+	const modifiedTree = R.over(
+		endpointLens,
+		R.inc,
+		tree);
+
+	t.throws(
+		() => IT.validate(modifiedTree),
+		errors.messages.wrongLowestEndpointStored(
+			R.view(endpointLens, tree),
+			R.view(nodeToTestLens, modifiedTree)));
+});
