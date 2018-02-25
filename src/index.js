@@ -112,7 +112,7 @@ function _remove(itemID, tree) {
 			return R.pipe(
 				R.set(successorLens, null),
 				R.set(lenses.item, successor.item),
-				updateExtrema,
+				updateExtrema
 			)(tree);
 		} else if (tree.left != null) {
 			return tree.left;
@@ -125,7 +125,7 @@ function _remove(itemID, tree) {
 		return R.pipe(
 			R.over(lenses.leftChild, remove(itemID)),
 			R.over(lenses.rightChild, remove(itemID)),
-			updateExtrema,
+			updateExtrema
 		)(tree);
 	}
 }

@@ -11,6 +11,7 @@
 
 ## Mutators
 @insert
+@remove
 
 ## Accessors
 @isEmpty
