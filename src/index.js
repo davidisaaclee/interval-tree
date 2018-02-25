@@ -54,17 +54,21 @@ const lenses = {
 // An empty interval tree.
 const empty = null;
 
-// node:: (Item, IntervalTree, IntervalTree) -> IntervalTree
+// node:: (Item, IntervalTree, IntervalTree, ?Index, ?Index) -> IntervalTree
 // Create a node with a value.
-const node = (item, left = null, right = null) => {
+const node = (
+	item, left = null, right = null, 
+	lowestEndpointInSubtree = item.range.low,
+	highestEndpointInSubtree = item.range.high
+) => {
 	if (item.range.high < item.range.low) {
 		throw new Error(errors.messages.negativeLengthInterval(item));
 	}
 
 	return ({
 		item,
-		highestEndpointInSubtree: item.range.high,
-		lowestEndpointInSubtree: item.range.low,
+		highestEndpointInSubtree,
+		lowestEndpointInSubtree,
 		left,
 		right
 	})

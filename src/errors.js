@@ -12,11 +12,11 @@ export const messages = {
 	),
 
 	leftChildOutOfOrder: parentNode => (
-		`Left child is out of order.`
+		`Left child is out of order: ${JSON.stringify(parentNode)}`
 	),
 
 	rightChildOutOfOrder: parentNode => (
-		`Right child is out of order.`
+		`Right child is out of order: ${JSON.stringify(parentNode)}`
 	),
 
 	wrongLowestEndpointStored: (expected, node) => (

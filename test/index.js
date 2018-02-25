@@ -198,18 +198,43 @@ test('validate passes on valid trees', t => {
 		IT.empty);
 });
 
-test('validate errors on invalid trees', t => {
+test('validate errors on trees with out-of-order left node', t => {
 	const outOfOrderLeftNodeTree = IT.node(
 		item('item1', 5, 10),
+		IT.empty,
 		IT.node(
-			item('item2', 8, 10),
+			item('item2', 8, 20),
+			IT.node(
+				item('item3', 9, 10),
+				IT.empty,
+				IT.empty,
+				9, 10),
 			IT.empty,
-			IT.empty),
-		IT.empty
-	);
+			8, 20),
+		5, 20);
 
 	t.throws(
 		() => IT.validate(outOfOrderLeftNodeTree),
-		errors.messages.leftChildOutOfOrder(outOfOrderLeftNodeTree));
+		errors.messages.leftChildOutOfOrder(outOfOrderLeftNodeTree.right));
+});
+
+test('validate errors on trees with out-of-order right node', t => {
+	const outOfOrderRightNodeTree = IT.node(
+		item('item1', 5, 10),
+		IT.node(
+			item('item2', 2, 10),
+			IT.empty,
+			IT.node(
+				item('item3', 1, 20),
+				IT.empty,
+				IT.empty,
+				1, 20),
+			1, 20),
+		IT.empty,
+		1, 20);
+
+	t.throws(
+		() => IT.validate(outOfOrderRightNodeTree),
+		errors.messages.rightChildOutOfOrder(outOfOrderRightNodeTree.left));
 });
 
