@@ -184,6 +184,52 @@ function _queryIntersection(range, tree) {
 }
 const queryIntersection = R.curry(_queryIntersection);
 
+// validate:: (IntervalTree) -> IntervalTree
+// #public
+// Checks that the provided tree is a valid `IntervalTree`.
+// Throws an error if the tree is invalid.
+// Returns the original tree if valid.
+function validate(tree) {
+	if (isEmpty(tree)) {
+		return tree;
+	}
+
+	if (tree.item.range.low > tree.item.range.high) {
+		throw new Error(error.messages.negativeLengthInterval(tree.item));
+	}
+
+	let lowestEndpoint = tree.item.range.low;
+	let highestEndpoint = tree.item.range.high;
+
+	// Validate ordering of immediate children.
+	if (!isEmpty(tree.left) && tree.left.item.range.low > tree.item.range.low) {
+		throw new Error(errors.messages.leftChildOutOfOrder(tree));
+	}
+	if (!isEmpty(tree.right) && tree.right.item.range.low < tree.item.range.low) {
+		throw new Error(errors.messages.rightChildOutOfOrder(tree));
+	}
+
+	// Validate children.
+	[tree.left, tree.right].forEach(child => {
+		if (!isEmpty(child)) {
+			validate(child);
+			lowestEndpoint =
+				Math.min(child.lowestEndpointInSubtree, lowestEndpoint);
+			highestEndpoint =
+				Math.max(child.highestEndpointInSubtree, highestEndpoint);
+		}
+	});
+
+	if (lowestEndpoint != tree.lowestEndpointInSubtree) {
+		throw new Error(errors.messages.wrongLowestEndpointStored(lowestEndpoint, tree));
+	}
+	if (highestEndpoint != tree.highestEndpointInSubtree) {
+		throw new Error(errors.messages.wrongHighestEndpointStored(highestEndpoint, tree));
+	}
+
+	return tree;
+}
+
 
 // -- Private helpers
 
@@ -304,10 +350,12 @@ function lensForSuccessorElement(tree) {
 
 export {
 	empty,
+	node,
 	insert,
 	remove,
 	isEmpty,
 	toObject,
 	queryIntersection,
+	validate,
 };
 

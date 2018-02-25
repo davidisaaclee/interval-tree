@@ -24,6 +24,10 @@ const fixtures = (() => {
 	return retval;
 })();
 
+const item =
+	(id, low, high) => ({ id, range: { low, high } });
+
+
 test('empty / isEmpty', t => {
 	t.true(IT.isEmpty(IT.empty));
 });
@@ -183,4 +187,29 @@ test('attempting to remove an item that doesn\'t exist from a tree', t => {
 });
 
 test.todo('removing item does not create an invalid augmented interval tree');
+
+test('validate passes on valid trees', t => {
+	t.deepEqual(
+		IT.validate(fixtures.tree1.tree),
+		fixtures.tree1.tree);
+
+	t.deepEqual(
+		IT.validate(IT.empty),
+		IT.empty);
+});
+
+test('validate errors on invalid trees', t => {
+	const outOfOrderLeftNodeTree = IT.node(
+		item('item1', 5, 10),
+		IT.node(
+			item('item2', 8, 10),
+			IT.empty,
+			IT.empty),
+		IT.empty
+	);
+
+	t.throws(
+		() => IT.validate(outOfOrderLeftNodeTree),
+		errors.messages.leftChildOutOfOrder(outOfOrderLeftNodeTree));
+});
 
