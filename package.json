@@ -17,9 +17,9 @@
 	],
 	"keywords": [],
 	"scripts": {
-		"build:umd": "cross-env BABEL_ENV=umd babel src --out-dir dist",
-		"build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
-		"build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
+		"build:commonjs": "rollup --config --output.format cjs --output.file lib/index.js",
+		"build:umd": "rollup --config --output.format umd --output.file dist/index.js",
+		"build:es": "rollup --config --output.format es --output.file es/index.js",
 		"build": "npm run build:commonjs && npm run build:umd && npm run build:es",
 		"prepare": "npm run test && npm run build",
 		"test": "cross-env BABEL_ENV=test nyc ava",
@@ -40,7 +40,9 @@
 		"mkdirp": "^0.5.1",
 		"node-sass": "^4.7.2",
 		"nyc": "^11.4.1",
-		"pug": "^2.0.0-rc.4"
+		"pug": "^2.0.0-rc.4",
+		"rollup": "^0.56.3",
+		"rollup-plugin-babel": "^4.0.0-beta.0"
 	},
 	"dependencies": {
 		"ramda": "^0.25.0"

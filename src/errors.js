@@ -1,7 +1,5 @@
 
-import { isEmpty } from './index';
-
-const printInterval = interval => isEmpty(interval) 
+const printInterval = interval => interval == null
 	? `(empty)`
 	: `((${interval.range.low}, ${interval.range.high}), ${interval.id})`;
 

@@ -1,5 +1,3 @@
-/** @module IntervalTree */
-import assert from 'assert';
 import * as R from 'ramda';
 
 import * as errors from './errors';
@@ -110,14 +108,16 @@ function _remove(itemID, tree) {
 			// Get in-order successor to `tree`; "delete" it; replace values in `tree`.
 			const successorLens =
 				lensForSuccessorElement(tree);
-			assert(successorLens != null);
+			// assert(successorLens != null);
 
 			const successor = 
 				R.view(successorLens, tree);
+			/*
 			assert.notEqual(
 				successor,
 				null,
 				`Expected successor of ${JSON.stringify(tree)}`);
+				*/
 
 			return R.pipe(
 				R.set(successorLens, empty),
