@@ -261,7 +261,7 @@ function updateHighestEndpointInTree(tree) {
 
 	const updateChildren = R.pipe(
 		R.over(lenses.leftChild, updateHighestEndpointInTree),
-		R.over(lenses.rightChild, updateHighestEndpointInTree),
+		R.over(lenses.rightChild, updateHighestEndpointInTree)
 	);
 
 	const highestEndpoint = R.converge(
@@ -280,7 +280,7 @@ function updateHighestEndpointInTree(tree) {
 		updateChildren,
 		R.converge(
 			R.set(lenses.highestEndpointInSubtree),
-			[highestEndpoint, R.identity]),
+			[highestEndpoint, R.identity])
 	)(
 		tree
 	);
@@ -295,7 +295,7 @@ function updateLowestEndpointInTree(tree) {
 
 	const updateChildren = R.pipe(
 		R.over(lenses.leftChild, updateLowestEndpointInTree),
-		R.over(lenses.rightChild, updateLowestEndpointInTree),
+		R.over(lenses.rightChild, updateLowestEndpointInTree)
 	);
 
 	const lowestEndpoint = R.converge(
@@ -314,7 +314,7 @@ function updateLowestEndpointInTree(tree) {
 		updateChildren,
 		R.converge(
 			R.set(lenses.lowestEndpointInSubtree),
-			[lowestEndpoint, R.identity]),
+			[lowestEndpoint, R.identity])
 	)(
 		tree
 	);

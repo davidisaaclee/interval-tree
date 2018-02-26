@@ -17,6 +17,7 @@
 @isEmpty
 @toObject
 @queryIntersection
+@validate
 
 @rangesIntersect
 @updateExtrema
