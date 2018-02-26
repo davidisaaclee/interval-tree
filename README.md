@@ -5,7 +5,7 @@ for easy serialization or use in a Redux state.
 
 ## Installation
 ```bash
-yarn add davidisaaclee/interval-tree
+yarn add @davidisaaclee/interval-tree
 ```
 
 ### Development
@@ -31,7 +31,9 @@ yarn run docs
 
 ### Constructing a tree
 ```javascript
-import * as IntervalTree from 'interval-tree';
+// One of:
+import * as IntervalTree from '@davidisaaclee/interval-tree';
+const IntervalTree = require('@davidisaaclee/interval-tree');
 
 let tree = IntervalTree.empty;
 
