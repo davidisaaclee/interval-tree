@@ -36,42 +36,42 @@ import * as IntervalTree from 'interval-tree';
 let tree = IntervalTree.empty;
 
 tree =
-	IntervalTree.insert(
-		{
-			id: 'interval1', 
-			range: {
-				low: 2,
-				high: 10
-			}
-		},
-		tree);
+  IntervalTree.insert(
+    {
+      id: 'interval1', 
+      range: {
+        low: 2,
+        high: 10
+      }
+    },
+    tree);
 
 const intervalsToAdd = [
-	{
-		id: 'interval2', 
-		range: {
-			low: 3,
-			high: 4
-		}
-	},
-	{
-		id: 'interval3', 
-		range: {
-			low: -5,
-			high: 0
-		}
-	},
+  {
+    id: 'interval2', 
+    range: {
+      low: 3,
+      high: 4
+    }
+  },
+  {
+    id: 'interval3', 
+    range: {
+      low: -5,
+      high: 0
+    }
+  },
 ];
 
 tree = intervalsToAdd.reduce(
-	(tree, interval) => IntervalTree.insert(interval, tree),
-	tree);
+  (tree, interval) => IntervalTree.insert(interval, tree),
+  tree);
 
 
 tree =
-	IntervalTree.remove(
-		'interval2',
-		tree);
+  IntervalTree.remove(
+    'interval2',
+    tree);
 ```
 
 ### Querying for intersecting intervals
@@ -79,41 +79,41 @@ tree =
 // `tree` is the tree we constructed in the example above,
 // with intervals `interval1` and `interval3`.
 const intersects5To10 =
-	IntervalTree.queryIntersection(
-		{ low: 5, high: 10 },
-		tree);
+  IntervalTree.queryIntersection(
+    { low: 5, high: 10 },
+    tree);
 
 assert.deepEqual(intersects5To10, {
-	'interval1': {
-		id: 'interval1', 
-		range: {
-			low: 2,
-			high: 10
-		}
-	}
+  'interval1': {
+    id: 'interval1', 
+    range: {
+      low: 2,
+      high: 10
+    }
+  }
 });
 
 
 const intersectsNegative4To3 =
-	IntervalTree.queryIntersection(
-		{ low: -4, high: 3 },
-		tree);
+  IntervalTree.queryIntersection(
+    { low: -4, high: 3 },
+    tree);
 
 assert.deepEqual(intersectsNegative4To3, {
-	'interval1': {
-		id: 'interval1', 
-		range: {
-			low: 2,
-			high: 10
-		}
-	},
-	'interval3': {
-		id: 'interval3', 
-		range: {
-			low: -5,
-			high: 0
-		}
-	},
+  'interval1': {
+    id: 'interval1', 
+    range: {
+      low: 2,
+      high: 10
+    }
+  },
+  'interval3': {
+    id: 'interval3', 
+    range: {
+      low: -5,
+      high: 0
+    }
+  },
 });
 ```
 
@@ -140,10 +140,10 @@ import * as R from 'ramda';
 // http://ramdajs.com/docs/#pipe
 
 const tree = R.pipe(
-	IntervalTree.insert(interval1),
-	IntervalTree.insert(interval2),
-	IntervalTree.insert(interval3),
-	IntervalTree.remove('interval2')
+  IntervalTree.insert(interval1),
+  IntervalTree.insert(interval2),
+  IntervalTree.insert(interval3),
+  IntervalTree.remove('interval2')
 )(IntervalTree.empty);
 ```
 
