@@ -8,10 +8,12 @@ export default {
 		name: 'IntervalTree',
 		globals: {
 			ramda: 'R',
+			'@davidisaaclee/bst': 'BST',
 		},
 	},
 	external: [
 		'ramda',
+		'@davidisaaclee/bst',
 	],
 	plugins: [
 		babel({

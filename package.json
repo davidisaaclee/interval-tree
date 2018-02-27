@@ -45,6 +45,7 @@
 		"rollup-plugin-babel": "^4.0.0-beta.0"
 	},
 	"dependencies": {
+		"@davidisaaclee/bst": "^0.1.0",
 		"ramda": "^0.25.0"
 	},
 	"ava": {

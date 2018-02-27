@@ -511,6 +511,12 @@
   dependencies:
     arrify "^1.0.1"
 
+"@davidisaaclee/bst@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@davidisaaclee/bst/-/bst-0.1.0.tgz#738589e52cb56c669475a195be780c9c3a66b64f"
+  dependencies:
+    ramda "^0.25.0"
+
 "@ladjs/time-require@^0.1.4":
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/@ladjs/time-require/-/time-require-0.1.4.tgz#5c615d75fd647ddd5de9cf6922649558856b21a1"

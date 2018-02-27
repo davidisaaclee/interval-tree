@@ -1,8 +1,8 @@
 import * as R from 'ramda';
+import { instantiate as instantiateBST } from '@davidisaaclee/bst';
 
 import * as errors from './errors';
 import * as lenses from './lenses';
-import { instantiate as instantiateBST } from './BST';
 
 const BST = instantiateBST({
 	shouldBeLeftChild: (parentData, childData) => (
