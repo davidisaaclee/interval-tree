@@ -1,3 +1,5 @@
+import * as R from 'ramda';
+import * as lenses from './lenses';
 
 const printInterval = interval => interval == null
 	? `(empty)`
@@ -18,11 +20,15 @@ export const messages = {
 	),
 
 	wrongLowestEndpointStored: (expected, node) => (
-		`Wrong lowest endpoint stored on node.\n\tExpected: ${expected}\n\tActual: ${node.lowestEndpointInSubtree}`
+		`Wrong lowest endpoint stored on node.
+	Expected: ${expected}
+	Actual: ${R.view(lenses.lowestEndpointInSubtree, node)}`
 	),
 
 	wrongHighestEndpointStored: (expected, node) => (
-		`Wrong highest endpoint stored on node.\n\tExpected: ${expected}\n\tActual: ${node.highestEndpointInSubtree}`
+		`Wrong highest endpoint stored on node.
+	Expected: ${expected}
+	Actual: ${R.view(lenses.highestEndpointInSubtree, node)}`
 	),
 };
 

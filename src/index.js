@@ -1,6 +1,15 @@
 import * as R from 'ramda';
 
 import * as errors from './errors';
+import * as lenses from './lenses';
+import { instantiate as instantiateBST } from './BST';
+
+const BST = instantiateBST({
+	shouldBeLeftChild: (parentData, childData) => (
+		parentData.item.range.low > childData.item.range.low
+	),
+});
+
 
 // Index:: number
 // #public
@@ -22,40 +31,23 @@ import * as errors from './errors';
 // #typealias
 // An item contained in an interval tree.
 
-// IntervalTree:: union<null, { item: Item, highestEndpointInSubtree: Index, lowestEndpointInSubtree: Index, left: IntervalTree, right: IntervalTree}>
+// IntervalTree:: BST<{ item: Item, highestEndpointInSubtree: Index, lowestEndpointInSubtree: Index }>
 // #public
 // #typealias
 // An augmented interval tree node.
 
-// -- Lenses
-const lenses = {
-	// leftChild :: Lens IntervalTree IntervalTree
-	leftChild: R.lensProp('left'),
-
-	// rightChild :: Lens IntervalTree IntervalTree
-	rightChild: R.lensProp('right'),
-
-	// item :: Lens IntervalTree Item
-	item: R.lensProp('item'),
-
-	// highestEndpointInSubtree :: Lens IntervalTree Index
-	highestEndpointInSubtree: R.lensProp('highestEndpointInSubtree'),
-
-	// lowestEndpointInSubtree :: Lens IntervalTree Index
-	lowestEndpointInSubtree: R.lensProp('lowestEndpointInSubtree'),
-};
 
 // -- Construction
 
 // empty:: IntervalTree
 // #public
 // An empty interval tree.
-const empty = null;
+const empty = BST.empty;
 
-// node:: (Item, IntervalTree, IntervalTree, ?Index, ?Index) -> IntervalTree
-// Create a node with a value.
-const node = (
-	item, left = null, right = null, 
+// Creates a BST.Data object for the specified IntervalTree item.
+// Checks for valid range.
+const dataForItem = (
+	item,
 	lowestEndpointInSubtree = item.range.low,
 	highestEndpointInSubtree = item.range.high
 ) => {
@@ -63,14 +55,26 @@ const node = (
 		throw new Error(errors.messages.negativeLengthInterval(item));
 	}
 
-	return ({
+	return {
 		item,
-		highestEndpointInSubtree,
 		lowestEndpointInSubtree,
-		left,
-		right
-	})
+		highestEndpointInSubtree,
+	}
 };
+
+// node:: (Item, IntervalTree, IntervalTree, ?Index, ?Index) -> IntervalTree
+// Create a node with a value.
+const node = (
+	item, left = null, right = null, 
+	lowestEndpointInSubtree = item.range.low,
+	highestEndpointInSubtree = item.range.high
+) => BST.node(
+	dataForItem(
+		item,
+		lowestEndpointInSubtree,
+		highestEndpointInSubtree),
+	left,
+	right);
 
 
 // -- Mutators
@@ -78,90 +82,37 @@ const node = (
 // insert:: (Item) -> (IntervalTree) -> IntervalTree
 // #public
 // Insert an item into a tree. Does not rebalance the tree.
-function _insert(item, tree) {
-	const nodeToInsert = node(item);
-
-	if (isEmpty(tree)) {
-		return nodeToInsert;
-	}
-
-	const descendLens = item.range.low < tree.item.range.low
-		? lenses.leftChild
-		: lenses.rightChild;
-
-	return R.pipe(
-		R.over(descendLens, insert(item)),
-		updateExtrema
-	)(tree);
-};
-const insert = R.curry(_insert);
+const insert = R.curry((item, tree) => R.pipe(
+	BST.insert,
+	updateExtrema
+)(
+	dataForItem(item), 
+	tree));
 
 // remove:: (ItemID) -> (IntervalTree) -> IntervalTree
 // #public
 // Returns a tree without the item with the specified item ID.
 // If multiple items have the same item ID, behavior is undefined.
-function _remove(itemID, tree) {
-	if (isEmpty(tree)) {
-		return tree;
-	} else if (tree.item.id === itemID) {
-		if (!isEmpty(tree.left) && !isEmpty(tree.right)) {
-			// Get in-order successor to `tree`; "delete" it; replace values in `tree`.
-			const successorLens =
-				lensForSuccessorElement(tree);
-			// assert(successorLens != null);
-
-			const successor = 
-				R.view(successorLens, tree);
-			/*
-			assert.notEqual(
-				successor,
-				null,
-				`Expected successor of ${JSON.stringify(tree)}`);
-				*/
-
-			return R.pipe(
-				R.set(successorLens, empty),
-				R.set(lenses.item, successor.item),
-				updateExtrema
-			)(tree);
-		} else if (!isEmpty(tree.left)) {
-			return tree.left;
-		} else if (!isEmpty(tree.right)) {
-			return tree.right;
-		} else {
-			return empty;
-		}
-	} else {
-		return R.pipe(
-			R.over(lenses.leftChild, remove(itemID)),
-			R.over(lenses.rightChild, remove(itemID)),
-			updateExtrema
-		)(tree);
-	}
-}
-const remove = R.curry(_remove);
+const remove = R.curry((itemID, tree) => (
+	R.pipe(
+		BST.remove(data => data.item.id === itemID),
+		updateExtrema
+	)(tree)
+));
 
 // -- Accessors
 
 // isEmpty:: (IntervalTree) -> bool
 // #public
 // Checks if a specified interval tree is empty.
-const isEmpty = tree => tree == null;
+const isEmpty = BST.isEmpty;
 
 // toObject:: (IntervalTree) -> map<ItemID, Item>
 // #public
 // Lists all intervals in an interval tree in a map from item ID to item.
-function _toObject(tree) {
-	if (isEmpty(tree)) {
-		return {};
-	} else {
-		return Object.assign(
-			{ [tree.item.id]: tree.item },
-			toObject(tree.left),
-			toObject(tree.right));
-	}
-}
-const toObject = R.curry(_toObject);
+const toObject = R.pipe(
+	BST.toObject(data => data.item.id),
+	R.map(data => data.item));
 
 // queryIntersection:: (Range) -> (IntervalTree) -> map<ItemID, Item>
 // #public
@@ -172,9 +123,9 @@ function _queryIntersection(range, tree) {
 		return {};
 	}
 
-	if (rangesIntersect(range, tree.item.range)) {
+	if (rangesIntersect(range, R.view(lenses.range, tree))) {
 		return Object.assign(
-			{ [tree.item.id]: tree.item },
+			{ [R.view(lenses.itemID, tree)]: R.view(lenses.item, tree) },
 			queryIntersection(range, tree.left),
 			queryIntersection(range, tree.right));
 	} else if (isEmpty(tree.left)) {
@@ -197,44 +148,54 @@ const queryIntersection = R.curry(_queryIntersection);
 // Throws an error if the tree is invalid.
 // Returns the original tree if valid.
 function validate(tree) {
-	if (isEmpty(tree)) {
+	return R.compose(BST.validate, validateIntervalTree)(tree);
+
+	function validateIntervalTree(tree) {
+		if (isEmpty(tree)) {
+			return tree;
+		}
+
+		const range = R.view(lenses.range, tree);
+		if (range.low > range.high) {
+			throw new Error(
+				error.messages.negativeLengthInterval(
+					R.view(lenses.item, tree)));
+		}
+
+		let lowestEndpoint = range.low;
+		let highestEndpoint = range.high;
+
+		// Validate children.
+		[tree.left, tree.right].forEach(child => {
+			if (!isEmpty(child)) {
+				validateIntervalTree(child);
+
+				lowestEndpoint =
+					Math.min(
+						R.view(lenses.lowestEndpointInSubtree, child),
+						lowestEndpoint);
+				highestEndpoint =
+					Math.max(
+						R.view(lenses.highestEndpointInSubtree, child),
+						highestEndpoint);
+			}
+		});
+
+		if (lowestEndpoint != R.view(lenses.lowestEndpointInSubtree, tree)) {
+			throw new Error(
+				errors.messages.wrongLowestEndpointStored(
+					lowestEndpoint,
+					tree));
+		}
+		if (highestEndpoint != R.view(lenses.highestEndpointInSubtree, tree)) {
+			throw new Error(
+				errors.messages.wrongHighestEndpointStored(
+					highestEndpoint,
+					tree));
+		}
+
 		return tree;
 	}
-
-	if (tree.item.range.low > tree.item.range.high) {
-		throw new Error(error.messages.negativeLengthInterval(tree.item));
-	}
-
-	let lowestEndpoint = tree.item.range.low;
-	let highestEndpoint = tree.item.range.high;
-
-	// Validate ordering of immediate children.
-	if (!isEmpty(tree.left) && tree.left.item.range.low > tree.item.range.low) {
-		throw new Error(errors.messages.leftChildOutOfOrder(tree));
-	}
-	if (!isEmpty(tree.right) && tree.right.item.range.low < tree.item.range.low) {
-		throw new Error(errors.messages.rightChildOutOfOrder(tree));
-	}
-
-	// Validate children.
-	[tree.left, tree.right].forEach(child => {
-		if (!isEmpty(child)) {
-			validate(child);
-			lowestEndpoint =
-				Math.min(child.lowestEndpointInSubtree, lowestEndpoint);
-			highestEndpoint =
-				Math.max(child.highestEndpointInSubtree, highestEndpoint);
-		}
-	});
-
-	if (lowestEndpoint != tree.lowestEndpointInSubtree) {
-		throw new Error(errors.messages.wrongLowestEndpointStored(lowestEndpoint, tree));
-	}
-	if (highestEndpoint != tree.highestEndpointInSubtree) {
-		throw new Error(errors.messages.wrongHighestEndpointStored(highestEndpoint, tree));
-	}
-
-	return tree;
 }
 
 
@@ -267,7 +228,7 @@ function updateHighestEndpointInTree(tree) {
 	const highestEndpoint = R.converge(
 		Math.max,
 		[
-			R.view(R.compose(lenses.item, R.lensProp('range'), R.lensProp('high'))),
+			R.view(R.compose(lenses.range, R.lensProp('high'))),
 			R.pipe(
 				R.view(R.compose(lenses.leftChild, lenses.highestEndpointInSubtree)),
 				R.defaultTo(-Infinity)),
@@ -301,7 +262,7 @@ function updateLowestEndpointInTree(tree) {
 	const lowestEndpoint = R.converge(
 		Math.min,
 		[
-			R.view(R.compose(lenses.item, R.lensProp('range'), R.lensProp('low'))),
+			R.view(R.compose(lenses.range, R.lensProp('low'))),
 			R.pipe(
 				R.view(R.compose(lenses.leftChild, lenses.lowestEndpointInSubtree)),
 				R.defaultTo(Infinity)),
@@ -318,41 +279,6 @@ function updateLowestEndpointInTree(tree) {
 	)(
 		tree
 	);
-}
-
-const hasChildren =
-	tree => tree.left != null || tree.right != null;
-
-// lensForCurrentMinElement :: (IntervalTree) -> ?(Lens IntervalTree IntervalTree)
-// Returns a lens focused on the position of the current minimum element in the specified tree.
-// If tree is empty, returns null instead of a lens.
-function lensForCurrentMinElement(tree) {
-	if (isEmpty(tree)) {
-		return null;
-	} else if (isEmpty(tree.left)) {
-		return R.identity;
-	} else {
-		return R.compose(
-			lenses.leftChild,
-			R.defaultTo(
-				R.identity,
-				lensForCurrentMinElement(tree.left)));
-	}
-}
-
-// lensForSuccessorElement :: (IntervalTree) -> ?(Lens IntervalTree IntervalTree)
-// If tree has no successor, returns null instead of a lens.
-function lensForSuccessorElement(tree) {
-	if (isEmpty(tree)) {
-		return null;
-	} if (isEmpty(tree.right)) {
-		return null;
-	} else {
-		return R.compose(
-			lenses.rightChild,
-			// guaranteed to be non-null
-			lensForCurrentMinElement(tree.right));
-	}
 }
 
 export {

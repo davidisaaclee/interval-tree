@@ -3,6 +3,7 @@ import * as R from 'ramda';
 
 import * as IT from '../src';
 import * as errors from '../src/errors';
+import * as lenses from '../src/lenses';
 
 const fixtures = (() => {
 	let retval = {};
@@ -72,11 +73,7 @@ test('insert throws on negative length interval ranges', t => {
 		id: 'interval1' 
 	};
 	t.throws(
-		() => R.pipe(
-			IT.insert(negativeLengthInterval),
-		)(
-			IT.empty
-		),
+		() => IT.insert(negativeLengthInterval, IT.empty),
 		errors.messages.negativeLengthInterval(negativeLengthInterval));
 });
 
@@ -251,9 +248,9 @@ test('validate errors on trees with incorrect highest endpoint', t => {
 	const { tree } = fixtures.tree1;
 
 	const nodeToTestLens =
-		R.lensPath(['left', 'left']);
+		R.compose(lenses.leftChild, lenses.leftChild);
 	const endpointLens =
-		R.compose(nodeToTestLens, R.lensProp('highestEndpointInSubtree'));
+		R.compose(nodeToTestLens, lenses.highestEndpointInSubtree);
 
 	const modifiedTree = R.over(
 		endpointLens,
@@ -271,9 +268,9 @@ test('validate errors on trees with incorrect lowest endpoint', t => {
 	const { tree } = fixtures.tree1;
 
 	const nodeToTestLens =
-		R.lensPath(['left', 'left']);
+		R.compose(lenses.leftChild, lenses.leftChild);
 	const endpointLens =
-		R.compose(nodeToTestLens, R.lensProp('lowestEndpointInSubtree'));
+		R.compose(nodeToTestLens, lenses.lowestEndpointInSubtree);
 
 	const modifiedTree = R.over(
 		endpointLens,

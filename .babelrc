@@ -1,8 +1,4 @@
 {
-	"plugins": [
-		"@babel/plugin-proposal-object-rest-spread",
-		"@babel/plugin-syntax-object-rest-spread",
-	],
 	"presets": [
 		[
 			"@babel/preset-env",
