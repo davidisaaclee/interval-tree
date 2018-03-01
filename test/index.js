@@ -20,7 +20,7 @@ const fixtures = (() => {
 
 	const tree = R.pipe(...R.map(IT.insert, intervals))(IT.empty);
 
-	retval['tree1'] = { tree, intervals };
+	retval['standard'] = { tree, intervals };
 
 	return retval;
 })();
@@ -109,24 +109,24 @@ test('queryIntersection2', t => {
 	t.deepEqual(
 		IT.queryIntersection(
 			{ low: 23, high: 25 },
-			fixtures.tree1.tree),
+			fixtures.standard.tree),
 		{
-			[fixtures.tree1.intervals[2].id]: fixtures.tree1.intervals[2],
+			[fixtures.standard.intervals[2].id]: fixtures.standard.intervals[2],
 		});
 
 	t.deepEqual(
 		IT.queryIntersection(
 			{ low: 12, high: 14 },
-			fixtures.tree1.tree),
+			fixtures.standard.tree),
 		{});
 
 	t.deepEqual(
 		IT.queryIntersection(
 			{ low: 21, high: 23 },
-			fixtures.tree1.tree),
+			fixtures.standard.tree),
 		{
-			[fixtures.tree1.intervals[2].id]: fixtures.tree1.intervals[2],
-			[fixtures.tree1.intervals[6].id]: fixtures.tree1.intervals[6],
+			[fixtures.standard.intervals[2].id]: fixtures.standard.intervals[2],
+			[fixtures.standard.intervals[6].id]: fixtures.standard.intervals[6],
 		});
 });
 
@@ -134,13 +134,13 @@ test.todo('queryIntersection with query greater than left subtree');
 test.todo('queryIntersection with query less than than right subtree');
 
 test('removing a leaf item from a tree', t => {
-	const { tree, intervals } = fixtures.tree1;
+	const { tree, intervals } = fixtures.standard;
 	const treeWithoutInterval2 =
-		IT.remove(fixtures.tree1.intervals[2].id, tree);
+		IT.remove(fixtures.standard.intervals[2].id, tree);
 
 	t.deepEqual(
 		IT.toObject(treeWithoutInterval2),
-		R.dissoc(fixtures.tree1.intervals[2].id, IT.toObject(tree)));
+		R.dissoc(fixtures.standard.intervals[2].id, IT.toObject(tree)));
 
 	t.deepEqual(
 		R.pipe(
@@ -152,21 +152,21 @@ test('removing a leaf item from a tree', t => {
 
 test('removing a middle node from a tree', t => {
 	const tree =
-		fixtures.tree1.tree;
+		fixtures.standard.tree;
 	const treeWithoutInterval1 =
-		IT.remove(fixtures.tree1.intervals[1].id, tree);
+		IT.remove(fixtures.standard.intervals[1].id, tree);
 
 	t.deepEqual(
 		IT.toObject(treeWithoutInterval1),
-		R.dissoc(fixtures.tree1.intervals[1].id, IT.toObject(tree)));
+		R.dissoc(fixtures.standard.intervals[1].id, IT.toObject(tree)));
 });
 
 test('removing each node from a tree', t => {
 	const tree =
-		fixtures.tree1.tree;
+		fixtures.standard.tree;
 
-	for (let i = 0; i < fixtures.tree1.intervals.length; i++) {
-		const interval = fixtures.tree1.intervals[i];
+	for (let i = 0; i < fixtures.standard.intervals.length; i++) {
+		const interval = fixtures.standard.intervals[i];
 
 		t.deepEqual(
 			IT.toObject(IT.remove(interval.id, tree)),
@@ -175,7 +175,7 @@ test('removing each node from a tree', t => {
 });
 
 test('attempting to remove an item that doesn\'t exist from a tree', t => {
-	const { tree, intervals } = fixtures.tree1;
+	const { tree, intervals } = fixtures.standard;
 
 	t.deepEqual(
 		IT.remove('not in tree', tree),
@@ -188,10 +188,10 @@ test('attempting to remove an item that doesn\'t exist from a tree', t => {
 
 test('removing item does not create an invalid augmented interval tree', t => {
 	const tree =
-		fixtures.tree1.tree;
+		fixtures.standard.tree;
 
-	for (let i = 0; i < fixtures.tree1.intervals.length; i++) {
-		const interval = fixtures.tree1.intervals[i];
+	for (let i = 0; i < fixtures.standard.intervals.length; i++) {
+		const interval = fixtures.standard.intervals[i];
 		t.notThrows(
 			() => R.pipe(IT.remove(interval.id), IT.validate)(tree));
 	}
@@ -199,8 +199,8 @@ test('removing item does not create an invalid augmented interval tree', t => {
 
 test('validate passes on valid trees', t => {
 	t.deepEqual(
-		IT.validate(fixtures.tree1.tree),
-		fixtures.tree1.tree);
+		IT.validate(fixtures.standard.tree),
+		fixtures.standard.tree);
 
 	t.deepEqual(
 		IT.validate(IT.empty),
@@ -208,7 +208,7 @@ test('validate passes on valid trees', t => {
 });
 
 test('validate errors on trees with incorrect highest endpoint', t => {
-	const { tree } = fixtures.tree1;
+	const { tree } = fixtures.standard;
 
 	const nodeToTestLens =
 		R.compose(lenses.leftChild, lenses.leftChild);
@@ -228,7 +228,7 @@ test('validate errors on trees with incorrect highest endpoint', t => {
 });
 
 test('validate errors on trees with incorrect lowest endpoint', t => {
-	const { tree } = fixtures.tree1;
+	const { tree } = fixtures.standard;
 
 	const nodeToTestLens =
 		R.compose(lenses.leftChild, lenses.leftChild);
