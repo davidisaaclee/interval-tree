@@ -124,20 +124,21 @@ function _queryIntersection(range, tree) {
 	}
 
 	if (rangesIntersect(range, R.view(lenses.range, tree))) {
-		return Object.assign(
+		return R.mergeAll([
 			{ [R.view(lenses.itemID, tree)]: R.view(lenses.item, tree) },
 			queryIntersection(range, tree.left),
-			queryIntersection(range, tree.right));
+			queryIntersection(range, tree.right)
+		]);
 	} else if (isEmpty(tree.left)) {
-		return queryIntersection(range, tree.right);
-	} else if (tree.left.highestEndpointInSubtree < range.low) {
-		return queryIntersection(range, tree.right);
-	} else if (tree.right.lowestEndpointInSubtree > range.high) {
-		return queryIntersection(range, tree.left);
+		return queryIntersection(range, R.view(lenses.rightChild, tree));
+	} else if (R.view(R.compose(lenses.leftChild, lenses.highestEndpointInSubtree), tree) < range.low) {
+		return queryIntersection(range, R.view(lenses.rightChild, tree));
+	} else if (R.view(R.compose(lenses.rightChild, lenses.lowestEndpointInSubtree), tree) > range.high) {
+		return queryIntersection(range, R.view(lenses.leftChild, tree));
 	} else {
-		return Object.assign(
-			queryIntersection(range, tree.left),
-			queryIntersection(range, tree.right));
+		return R.merge(
+			queryIntersection(range, R.view(lenses.leftChild, tree)),
+			queryIntersection(range, R.view(lenses.rightChild, tree)));
 	}
 }
 const queryIntersection = R.curry(_queryIntersection);

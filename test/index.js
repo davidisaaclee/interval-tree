@@ -8,6 +8,7 @@ import * as lenses from '../src/lenses';
 const fixtures = (() => {
 	let retval = {};
 
+	// makeFixtureFromIntervals :: [IntervalTree.Item] -> { tree: IntervalTree, intervals: [IntervalTree.Item] }
 	function makeFixtureFromIntervals(intervals) {
 		return {
 			intervals,
@@ -24,6 +25,22 @@ const fixtures = (() => {
 			{ range: { low: 15, high: 18 }, id: 'interval4' },
 			{ range: { low: 7, high: 10 }, id: 'interval5' },
 			{ range: { low: 16, high: 22 }, id: 'interval6' },
+		]),
+
+		standard2: makeFixtureFromIntervals([
+			{ range: { low: 17, high: 19 }, id: 'interval0' },
+			{ range: { low: 6, high: 8 }, id: 'interval1' },
+			{ range: { low: 21, high: 24 }, id: 'interval2' },
+			{ range: { low: 2, high: 6 }, id: 'interval3' },
+			{ range: { low: 15, high: 18 }, id: 'interval4' },
+			{ range: { low: 7, high: 10 }, id: 'interval5' },
+			{ range: { low: 16, high: 22 }, id: 'interval6' },
+		]),
+
+		containingBidirectionallyInfiniteRange: makeFixtureFromIntervals([
+			{ range: { low: 17, high: 19 }, id: 'interval0' },
+			{ range: { low: 5, high: 8 }, id: 'interval1' },
+			{ range: { low: -Infinity, high: Infinity }, id: 'interval2' }
 		]),
 	};
 })();
@@ -133,7 +150,18 @@ test('queryIntersection2', t => {
 		});
 });
 
-test.todo('queryIntersection with query greater than left subtree');
+test('queryIntersection with query greater than left subtree', t => {
+	const { tree, intervals } = fixtures.standard2;
+
+	t.deepEqual(
+		IT.queryIntersection(
+			{ low: 9, high: 15 },
+			tree),
+		R.indexBy(
+			R.prop('id'), 
+			[intervals[4], intervals[5]]));
+});
+
 test.todo('queryIntersection with query less than than right subtree');
 
 test('removing a leaf item from a tree', t => {
