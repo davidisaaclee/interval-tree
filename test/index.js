@@ -130,6 +130,9 @@ test('queryIntersection2', t => {
 		});
 });
 
+test.todo('queryIntersection with query greater than left subtree');
+test.todo('queryIntersection with query less than than right subtree');
+
 test('removing a leaf item from a tree', t => {
 	const { tree, intervals } = fixtures.tree1;
 	const treeWithoutInterval2 =
@@ -202,46 +205,6 @@ test('validate passes on valid trees', t => {
 	t.deepEqual(
 		IT.validate(IT.empty),
 		IT.empty);
-});
-
-test('validate errors on trees with out-of-order left node', t => {
-	const outOfOrderLeftNodeTree = IT.node(
-		item('item1', 5, 10),
-		IT.empty,
-		IT.node(
-			item('item2', 8, 20),
-			IT.node(
-				item('item3', 9, 10),
-				IT.empty,
-				IT.empty,
-				9, 10),
-			IT.empty,
-			8, 20),
-		5, 20);
-
-	t.throws(
-		() => IT.validate(outOfOrderLeftNodeTree),
-		errors.messages.leftChildOutOfOrder(outOfOrderLeftNodeTree.right));
-});
-
-test('validate errors on trees with out-of-order right node', t => {
-	const outOfOrderRightNodeTree = IT.node(
-		item('item1', 5, 10),
-		IT.node(
-			item('item2', 2, 10),
-			IT.empty,
-			IT.node(
-				item('item3', 1, 20),
-				IT.empty,
-				IT.empty,
-				1, 20),
-			1, 20),
-		IT.empty,
-		1, 20);
-
-	t.throws(
-		() => IT.validate(outOfOrderRightNodeTree),
-		errors.messages.rightChildOutOfOrder(outOfOrderRightNodeTree.left));
 });
 
 test('validate errors on trees with incorrect highest endpoint', t => {

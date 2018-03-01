@@ -11,14 +11,6 @@ export const messages = {
 		${printInterval(interval)}`
 	),
 
-	leftChildOutOfOrder: parentNode => (
-		`Left child is out of order: ${JSON.stringify(parentNode)}`
-	),
-
-	rightChildOutOfOrder: parentNode => (
-		`Right child is out of order: ${JSON.stringify(parentNode)}`
-	),
-
 	wrongLowestEndpointStored: (expected, node) => (
 		`Wrong lowest endpoint stored on node.
 	Expected: ${expected}
