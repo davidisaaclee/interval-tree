@@ -1,6 +1,6 @@
 {
 	"name": "@davidisaaclee/interval-tree",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"main": "./lib/index.js",
 	"module": "./es/index.js",
 	"author": "David Lee <david@david-lee.net>",
