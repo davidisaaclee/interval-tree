@@ -37,10 +37,12 @@ const fixtures = (() => {
 			{ range: { low: 16, high: 22 }, id: 'interval6' },
 		]),
 
-		containingBidirectionallyInfiniteRange: makeFixtureFromIntervals([
+		infiniteRanges: makeFixtureFromIntervals([
 			{ range: { low: 17, high: 19 }, id: 'interval0' },
 			{ range: { low: 5, high: 8 }, id: 'interval1' },
-			{ range: { low: -Infinity, high: Infinity }, id: 'interval2' }
+			{ range: { low: -Infinity, high: Infinity }, id: 'interval2' },
+			{ range: { low: 9, high: Infinity }, id: 'interval3' },
+			{ range: { low: -Infinity, high: 6 }, id: 'interval4' },
 		]),
 	};
 })();
@@ -263,3 +265,64 @@ test('validate errors on trees with incorrect lowest endpoint', t => {
 			R.view(endpointLens, tree),
 			R.view(nodeToTestLens, modifiedTree)));
 });
+
+test('querying tree containing (-infinity, infinity) interval works', t => {
+	const { tree, intervals } = fixtures.infiniteRanges;
+
+	t.deepEqual(
+		IT.queryIntersection({ low: 6, high: 10 }, tree),
+		R.indexBy(R.prop('id'), [intervals[1], intervals[2], intervals[3], intervals[4]])
+	);
+
+	t.deepEqual(
+		R.pipe(
+			IT.remove('interval1'),
+			IT.queryIntersection({ low: 6, high: 10 }),
+		)(tree),
+		R.indexBy(R.prop('id'), [intervals[2], intervals[3], intervals[4]])
+	);
+
+	t.deepEqual(
+		R.pipe(
+			IT.remove('interval2'),
+			IT.queryIntersection({ low: 6, high: 10 }),
+		)(tree),
+		R.indexBy(R.prop('id'), [intervals[1], intervals[3], intervals[4]])
+	);
+
+	const newInfiniteInterval =
+		{ range: { low: -Infinity, high: Infinity }, id: 'newInfiniteInterval' };
+	t.deepEqual(
+		R.pipe(
+			IT.insert(newInfiniteInterval),
+			IT.queryIntersection({ low: 6, high: 10 }),
+		)(tree),
+		R.indexBy(R.prop('id'), [
+			intervals[1],
+			intervals[2],
+			intervals[3],
+			intervals[4],
+			newInfiniteInterval
+		])
+	);
+});
+
+test('querying tree for intersections within infinite interval works', t => {
+	const { tree, intervals } = fixtures.infiniteRanges;
+
+	t.deepEqual(
+		IT.queryIntersection({ low: -Infinity, high: Infinity }, tree),
+		IT.toObject(tree),
+	);
+
+	t.deepEqual(
+		IT.queryIntersection({ low: 18, high: Infinity }, tree),
+		R.indexBy(R.prop('id'), [intervals[0], intervals[2], intervals[3]])
+	);
+
+	t.deepEqual(
+		IT.queryIntersection({ low: -Infinity, high: 6 }, tree),
+		R.indexBy(R.prop('id'), [intervals[1], intervals[2], intervals[4]])
+	);
+});
+
