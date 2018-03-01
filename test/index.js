@@ -150,20 +150,6 @@ test('queryIntersection2', t => {
 		});
 });
 
-test('queryIntersection with query greater than left subtree', t => {
-	const { tree, intervals } = fixtures.standard2;
-
-	t.deepEqual(
-		IT.queryIntersection(
-			{ low: 9, high: 15 },
-			tree),
-		R.indexBy(
-			R.prop('id'), 
-			[intervals[4], intervals[5]]));
-});
-
-test.todo('queryIntersection with query less than than right subtree');
-
 test('removing a leaf item from a tree', t => {
 	const { tree, intervals } = fixtures.standard;
 	const treeWithoutInterval2 =
